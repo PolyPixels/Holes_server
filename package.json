@@ -1,0 +1,29 @@
+{
+  "name": "holes_server",
+  "version": "0.0.1",
+  "description": "starts up a new holes server",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PolyPixels/Holes_server.git"
+  },
+  "keywords": [
+    "server",
+    "game",
+    "node",
+    "js"
+  ],
+  "author": "polypixel",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PolyPixels/Holes_server/issues"
+  },
+  "homepage": "https://github.com/PolyPixels/Holes_server#readme",
+  "dependencies": {
+    "express": "^4.21.1",
+    "socket.io": "^4.8.1"
+  }
+}
