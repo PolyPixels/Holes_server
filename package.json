@@ -24,6 +24,7 @@
   "homepage": "https://github.com/PolyPixels/Holes_server#readme",
   "dependencies": {
     "express": "^4.21.1",
+    "simplex-noise": "^4.0.3",
     "socket.io": "^4.8.1"
   }
 }
