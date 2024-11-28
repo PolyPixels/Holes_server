@@ -23,9 +23,9 @@ function newConnection(socket){
     io.to(socket.id).emit("OLD_PLAYERS", players);
     io.to(socket.id).emit("YOUR_ID", socket.id);
     let tempData = {};
-    for(let x=0; x<800/16; x++){
-        for(let y=0; y<800/16; y++){
-            tempData[(x+(y/(800/16)))] = serverMap.data[(x+(y/(800/16)))];
+    for(let x=0; x<serverMap.WIDTH; x++){
+        for(let y=0; y<serverMap.HEIGHT; y++){
+            tempData[(x+(y/serverMap.HEIGHT))] = serverMap.data[(x+(y/serverMap.HEIGHT))];
         }
     }
     io.to(socket.id).emit("GIVE_MAP", tempData);
@@ -40,9 +40,15 @@ function newConnection(socket){
 
     socket.on("update_pos", update_pos);
     function update_pos(data){
-        console.log("updating " + data.id);
+        //console.log("updating " + data.id);
         players[data.id] = data;
         socket.broadcast.emit("UPDATE_POS", data);
+    }
+
+    socket.on("update_node", update_map);
+    function update_map(data){
+        serverMap.data[data.index] = data.val;
+        socket.broadcast.emit("UPDATE_NODE", data);
     }
 }
 
