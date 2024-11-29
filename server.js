@@ -3,7 +3,7 @@ const socket = require("socket.io");
 const { createNoise2D } = require('simplex-noise');
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-console.log(validColors)
+
 const port = 3000;
 const app = express();
 
@@ -50,7 +50,6 @@ function newConnection(socket) {
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_PLAYERS", players);
         let newColor = validColors.pop()
-        console.log("send Color")
         io.to(socket.id).emit("YOUR_ID", {id:socket.id,color:newColor});
 
         let tempData = {};
@@ -72,10 +71,25 @@ function newConnection(socket) {
         socket.on("update_pos", update_pos);
 
         function update_pos(data) {
-            players[data.id] = data;
-            socket.broadcast.emit("UPDATE_POS", data);
-        }
-
+          if (!players[data.id]) {
+              console.error(`Player with id ${data.id} not found.`);
+              return;
+          }
+      
+          // Only update mutable properties (dynamic data like position, health, etc.)
+          players[data.id].pos = data.pos;
+          players[data.id].hp = data.hp;
+          players[data.id].holding = data.holding;
+      
+          // Broadcast the updated position to other clients
+          socket.broadcast.emit("UPDATE_POS", {
+              id: data.id,
+              pos: data.pos,
+              hp: data.hp,
+              holding: data.holding
+          });
+      }
+      
         socket.on("update_node", update_map);
 
         function update_map(data) {
