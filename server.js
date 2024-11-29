@@ -72,6 +72,14 @@ function newConnection(socket) {
             serverMap.data[data.index] = data.val;
             socket.broadcast.emit("UPDATE_NODE", data);
         }
+
+        socket.on("disconnect", disconnect);
+
+        function disconnect(data){
+            console.log(socket.id + " disconnected");
+            delete players[socket.id];
+            socket.broadcast.emit("REMOVE_PLAYER", socket.id);
+        }
     } catch (e) {
         console.log(e);
     }
