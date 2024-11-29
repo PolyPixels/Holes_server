@@ -58,6 +58,7 @@ function newConnection(socket) {
 
         function new_player(data) {
             players[data.id] = data;
+            console.log("new player Data", data)
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
         }
