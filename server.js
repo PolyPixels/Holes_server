@@ -2,7 +2,8 @@ const express = require('express');
 const socket = require("socket.io");
 const { createNoise2D } = require('simplex-noise');
 const cors = require("cors");
-
+const { validColors } = require('./utils/color');
+console.log(validColors)
 const port = 3000;
 const app = express();
 
@@ -34,8 +35,12 @@ io.sockets.on('connection', newConnection);
 const noise2D = createNoise2D();
 const players = {}; // All players
 const serverMap = new Map(800 / 16, 800 / 16, 16);
+
+
 serverMap.generate();
 serverMap.createRooms();
+
+
 
 function newConnection(socket) {
     try {
@@ -44,7 +49,9 @@ function newConnection(socket) {
 
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_PLAYERS", players);
-        io.to(socket.id).emit("YOUR_ID", socket.id);
+        let newColor = validColors.pop()
+        console.log("send Color")
+        io.to(socket.id).emit("YOUR_ID", {id:socket.id,color:newColor});
 
         let tempData = {};
         for (let x = 0; x < serverMap.WIDTH; x++) {
@@ -58,7 +65,6 @@ function newConnection(socket) {
 
         function new_player(data) {
             players[data.id] = data;
-            console.log("new player Data", data)
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
         }
@@ -81,6 +87,7 @@ function newConnection(socket) {
 
         function disconnect(data){
             console.log(socket.id + " disconnected");
+            validColors.push(data.color)
             delete players[socket.id];
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
