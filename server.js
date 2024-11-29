@@ -39,6 +39,9 @@ serverMap.createRooms();
 
 function newConnection(socket) {
     try {
+        //all caps means it came from the server
+        //all lower means it came from the client
+
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_PLAYERS", players);
         io.to(socket.id).emit("YOUR_ID", socket.id);
@@ -90,12 +93,12 @@ function Map(w, h, ts) {
     this.WIDTH = w;
     this.HEIGHT = h;
     this.tileSize = ts;
-    const NOISE_SCALE = this.tileSize * 0.013;
+    const NOISE_SCALE = this.tileSize * 0.013; //changing the multiplication number changes the size of natual air pockets
 
     this.generate = function () {
         for (let x = 0; x < this.WIDTH; x++) {
             for (let y = 0; y < this.HEIGHT; y++) {
-                this.data[x + (y / this.WIDTH)] = (noise2D(NOISE_SCALE * (x + 1), NOISE_SCALE * (y + 1)) / 2) + 0.5;
+                this.data[x + (y / this.WIDTH)] = (noise2D(NOISE_SCALE * (x + 1), NOISE_SCALE * (y + 1)) / 2) + 0.5; //! why doing this 2 times?
             }
         }
     };
@@ -106,16 +109,16 @@ function Map(w, h, ts) {
                 const OFF = this.tileSize * this.tileSize;
                 const index = x + (y / this.WIDTH);
                 if (x === 0 || y === 0 || x === this.WIDTH - 1 || y === this.HEIGHT - 1) {
-                    this.data[index] = -1.0;
+                    this.data[index] = -1.0; //outer walls
                     continue;
                 }
                 const nx = NOISE_SCALE * (x + OFF);
                 const ny = NOISE_SCALE * (y + OFF);
-                this.data[index] -= ((noise2D(nx, ny) / 2) + 0.5) * 0.25;
+                this.data[index] -= ((noise2D(nx, ny) / 2) + 0.5) * 0.25; //! why doing this 2 times?
                 this.data[index] *= 1.5;
 
                 const CUT_OFF = 0.2;
-                if (this.data[index] < CUT_OFF) this.data[index] = 0;
+                if (this.data[index] < CUT_OFF) this.data[index] = 0; //air pockets
             }
         }
     };
