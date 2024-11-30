@@ -50,7 +50,7 @@ function newConnection(socket) {
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_PLAYERS", players);
         let newColor = validColors.pop()
-        io.to(socket.id).emit("YOUR_ID", {id:socket.id,color:newColor});
+        io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
 
         let tempData = {};
         for (let x = 0; x < serverMap.WIDTH; x++) {
@@ -102,9 +102,23 @@ function newConnection(socket) {
         function disconnect(data){
             console.log(socket.id + " disconnected");
             validColors.push(data.color)
+            players[socket.id] = []
             delete players[socket.id];
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
+
+        socket.on("update_player_data", update_player_data);
+
+        function update_player_data(data){
+            console.log(socket.id + " data update", data);
+
+            players[socket.id].race = data.race
+
+            players[socket.id].name = data.name
+            // get and set name and race
+            
+        }
+
     } catch (e) {
         console.log(e);
     }
