@@ -34,6 +34,7 @@ io.sockets.on('connection', newConnection);
 
 const noise2D = createNoise2D();
 const players = {}; // All players
+const traps = []
 const serverMap = new Map(800 / 16, 800 / 16, 16);
 
 
@@ -48,7 +49,7 @@ function newConnection(socket) {
         //all lower means it came from the client
 
         console.log('New connection: ' + socket.id);
-        io.to(socket.id).emit("OLD_PLAYERS", players);
+        io.to(socket.id).emit("OLD_DATA", {players:players,traps:traps });
         let newColor = validColors.pop()
         io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
 
@@ -107,17 +108,17 @@ function newConnection(socket) {
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
 
-        socket.on("update_player_data", update_player_data);
+        socket.on("spawn_trap", spawnTrap);
 
-        function update_player_data(data){
-            console.log(socket.id + " data update", data);
-
-            players[socket.id].race = data.race
-
-            players[socket.id].name = data.name
-            // get and set name and race
-            
+        function spawnTrap(data){
+            console.log("spawn trap  ", data)
+            traps.push(data)
+            socket.broadcast.emit("spawn_trap", data);
         }
+
+
+
+        const BASE_HEALTH = 10;
 
     } catch (e) {
         console.log(e);
