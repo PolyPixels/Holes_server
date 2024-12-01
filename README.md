@@ -115,7 +115,7 @@ The server includes a noise-based map generation system. Each map is dynamically
 ## Troubleshooting
 
 ### CORS Errors
-If you encounter **CORS errors**, ensure that the frontend and backend are configured properly. The server has been configured to allow requests from `http://127.0.0.1:5500`.
+If you encounter **CORS errors**, ensure that the frontend and backend are configured properly. The server has been configured to allow requests from [`http://127.0.0.1:5500`](http://127.0.0.1:5500/game/index.html).
 
 ---
 d
