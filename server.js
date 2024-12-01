@@ -118,7 +118,8 @@ function Map(w, h, ts) {
                 this.data[index] -= ((noise2D(nx, ny) / 2) + 0.5) * 0.25; //! why doing this 2 times?
                 this.data[index] *= 1.5;
 
-                const CUT_OFF = 0.2;
+                //this.data[index] = 1;
+                const CUT_OFF = 0.3;
                 if (this.data[index] < CUT_OFF) this.data[index] = 0; //air pockets
             }
         }
