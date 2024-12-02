@@ -1,8 +1,8 @@
 const express = require('express');
 const socket = require("socket.io");
-const { createNoise2D } = require('simplex-noise');
 const cors = require("cors");
 const { validColors } = require('./utils/color');
+const { Map, Chunk, TILESIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -32,16 +32,9 @@ const io = socket(server, {
 
 io.sockets.on('connection', newConnection);
 
-const noise2D = createNoise2D();
 const players = {}; // All players
 const traps = []
-const serverMap = new Map(800 / 16, 800 / 16, 16);
-
-
-serverMap.generate();
-serverMap.createRooms();
-
-
+const serverMap = new Map();
 
 function newConnection(socket) {
     try {
@@ -50,16 +43,8 @@ function newConnection(socket) {
 
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_DATA", {players:players,traps:traps });
-        let newColor = validColors.pop()
+        let newColor = validColors.pop();
         io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
-
-        let tempData = {};
-        for (let x = 0; x < serverMap.WIDTH; x++) {
-            for (let y = 0; y < serverMap.HEIGHT; y++) {
-                tempData[(x + (y / serverMap.HEIGHT))] = serverMap.data[(x + (y / serverMap.HEIGHT))];
-            }
-        }
-        io.to(socket.id).emit("GIVE_MAP", tempData);
 
         socket.on('new_player', new_player);
 
@@ -72,23 +57,23 @@ function newConnection(socket) {
         socket.on("update_pos", update_pos);
 
         function update_pos(data) {
-          if (!players[data.id]) {
-              console.error(`Player with id ${data.id} not found.`);
-              return;
-          }
+        if (!players[data.id]) {
+            console.error(`Player with id ${data.id} not found.`);
+            return;
+        }
       
-          // Only update mutable properties (dynamic data like position, health, etc.)
-          players[data.id].pos = data.pos;
-          players[data.id].hp = data.hp;
-          players[data.id].holding = data.holding;
-      
-          // Broadcast the updated position to other clients
-          socket.broadcast.emit("UPDATE_POS", {
-              id: data.id,
-              pos: data.pos,
-              hp: data.hp,
-              holding: data.holding
-          });
+        // Only update mutable properties (dynamic data like position, health, etc.)
+        players[data.id].pos = data.pos;
+        players[data.id].hp = data.hp;
+        players[data.id].holding = data.holding;
+    
+        // Broadcast the updated position to other clients
+        socket.broadcast.emit("UPDATE_POS", {
+            id: data.id,
+            pos: data.pos,
+            hp: data.hp,
+            holding: data.holding
+        });
       }
       
         socket.on("update_node", update_map);
@@ -116,48 +101,22 @@ function newConnection(socket) {
             socket.broadcast.emit("spawn_trap", data);
         }
 
+        socket.on("get_chunk", get_chunk);
 
-
-        const BASE_HEALTH = 10;
-
+        function get_chunk(data){
+            let pos = data.split(",");
+            pos[0] = parseInt(pos[0]);
+            pos[1] = parseInt(pos[1]);
+            let chunk = serverMap.getChunk(pos[0],pos[1]);
+            let tempData = {};
+            for (let x = 0; x < chunk.size.x; x++) {
+                for (let y = 0; y < chunk.size.y; y++) {
+                    tempData[(x + (y / chunk.size.y))] = chunk.data[(x + (y / chunk.size.y))];
+                }
+            }
+            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData});
+        }
     } catch (e) {
         console.log(e);
     }
-}
-
-function Map(w, h, ts) {
-    this.data = [];
-    this.WIDTH = w;
-    this.HEIGHT = h;
-    this.tileSize = ts;
-    const NOISE_SCALE = this.tileSize * 0.013; //changing the multiplication number changes the size of natual air pockets
-
-    this.generate = function () {
-        for (let x = 0; x < this.WIDTH; x++) {
-            for (let y = 0; y < this.HEIGHT; y++) {
-                this.data[x + (y / this.WIDTH)] = (noise2D(NOISE_SCALE * (x + 1), NOISE_SCALE * (y + 1)) / 2) + 0.5; //! why doing this 2 times?
-            }
-        }
-    };
-
-    this.createRooms = function () {
-        for (let x = 0; x < this.WIDTH; x++) {
-            for (let y = 0; y < this.HEIGHT; y++) {
-                const OFF = this.tileSize * this.tileSize;
-                const index = x + (y / this.WIDTH);
-                if (x === 0 || y === 0 || x === this.WIDTH - 1 || y === this.HEIGHT - 1) {
-                    this.data[index] = -1.0; //outer walls
-                    continue;
-                }
-                const nx = NOISE_SCALE * (x + OFF);
-                const ny = NOISE_SCALE * (y + OFF);
-                this.data[index] -= ((noise2D(nx, ny) / 2) + 0.5) * 0.25; //! why doing this 2 times?
-                this.data[index] *= 1.5;
-
-                //this.data[index] = 1;
-                const CUT_OFF = 0.3;
-                if (this.data[index] < CUT_OFF) this.data[index] = 0; //air pockets
-            }
-        }
-    };
 }
