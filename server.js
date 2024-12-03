@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, TILESIZE } = require('./utils/map');
+const { Map, Chunk, TILESIZE, CHUNKSIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -79,7 +79,7 @@ function newConnection(socket) {
         socket.on("update_node", update_map);
 
         function update_map(data) {
-            serverMap.data[data.index] = data.val;
+            serverMap.chunks[data.chunkPos].data[data.index] = data.val;
             socket.broadcast.emit("UPDATE_NODE", data);
         }
 
@@ -109,9 +109,9 @@ function newConnection(socket) {
             pos[1] = parseInt(pos[1]);
             let chunk = serverMap.getChunk(pos[0],pos[1]);
             let tempData = {};
-            for (let x = 0; x < chunk.size.x; x++) {
-                for (let y = 0; y < chunk.size.y; y++) {
-                    tempData[(x + (y / chunk.size.y))] = chunk.data[(x + (y / chunk.size.y))];
+            for (let x = 0; x < CHUNKSIZE; x++) {
+                for (let y = 0; y < CHUNKSIZE; y++) {
+                    tempData[(x + (y / CHUNKSIZE))] = chunk.data[(x + (y / CHUNKSIZE))];
                 }
             }
             io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData});

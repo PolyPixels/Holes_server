@@ -2,6 +2,7 @@ const { createNoise2D } = require('simplex-noise');
 const noise2D = createNoise2D();
 
 const TILESIZE = 16;
+const CHUNKSIZE = 50;
 
 class Map{
     constructor(){
@@ -22,26 +23,23 @@ class Map{
 class Chunk{
     constructor(x,y){
         this.data = []; // Data is very obvious, -1 is unbreakable, 0 is nothing, >0 is block
-        this.size = {};
-        this.size.x = 800 / TILESIZE;
-        this.size.y = 800 / TILESIZE;
         this.NOISE_SCALE = TILESIZE * 0.013; //changing the multiplication number changes the size of natual air pockets
         this.cx = x;
         this.cy = y;
     }
 
     generate(){
-        for (let x = 0; x < this.size.x; x++) {
-            for (let y = 0; y < this.size.y; y++) {
-                // if (x === 0 || y === 0 || x === this.size.x - 1 || y === this.size.y - 1) {
+        for (let x = 0; x < CHUNKSIZE; x++) {
+            for (let y = 0; y < CHUNKSIZE; y++) {
+                // if (x === 0 || y === 0 || x === CHUNKSIZE - 1 || y === CHUNKSIZE - 1) {
                 //     this.data[index] = -1.0; //outer walls
                 //     continue;
                 // }
                 const OFF = TILESIZE * TILESIZE;
-                const index = x + (y / this.size.x);
-                const nx = this.NOISE_SCALE * (x + OFF + (this.cx * TILESIZE * this.size.x));
-                const ny = this.NOISE_SCALE * (y + OFF + (this.cy * TILESIZE * this.size.y));
-                this.data[x + (y / this.size.x)] = (noise2D(this.NOISE_SCALE * (x + 1), this.NOISE_SCALE * (y + 1)) / 2) + 0.5; //! why doing this 2 times?
+                const index = x + (y / CHUNKSIZE);
+                const nx = this.NOISE_SCALE * (x + OFF + (this.cx * TILESIZE * CHUNKSIZE));
+                const ny = this.NOISE_SCALE * (y + OFF + (this.cy * TILESIZE * CHUNKSIZE));
+                this.data[x + (y / CHUNKSIZE)] = (noise2D(this.NOISE_SCALE * (x + 1), this.NOISE_SCALE * (y + 1)) / 2) + 0.5; //! why doing this 2 times?
                 this.data[index] -= ((noise2D(nx, ny) / 2) + 0.5) * 0.25; //! why doing this 2 times?
                 this.data[index] *= 1.5;
 
@@ -53,4 +51,4 @@ class Chunk{
     }
 }
 
-module.exports = {Map, Chunk, TILESIZE };
+module.exports = {Map, Chunk, TILESIZE, CHUNKSIZE };
