@@ -26,6 +26,7 @@ class Chunk{
         this.NOISE_SCALE = TILESIZE * 0.009; //changing the multiplication number changes the size of natual air pockets
         this.cx = x;
         this.cy = y;
+        this.objects = [];
     }
 
     generate(){
@@ -51,4 +52,14 @@ class Chunk{
     }
 }
 
-module.exports = {Map, Chunk, TILESIZE, CHUNKSIZE };
+class Placeable{
+    constructor(x,y,rot){
+        this.pos = {x: x, y: y};
+        this.rot = rot;
+        this.openBool = true;
+    }
+
+
+}
+
+module.exports = {Map, Chunk, Placeable, TILESIZE, CHUNKSIZE };

@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -101,6 +101,16 @@ function newConnection(socket) {
             socket.broadcast.emit("spawn_trap", data);
         }
 
+        socket.on("new_object", new_object);
+
+        function new_object(data){
+            let chunk = serverMap.getChunk(data.cx, data.cy);
+            let temp = new Placeable(data.pos.x, data.pos.y, data.rot);
+            chunk.objects.push(temp);
+
+            socket.broadcast.emit("NEW_OBJECT", data);
+        }
+
         socket.on("get_chunk", get_chunk);
 
         function get_chunk(data){
@@ -114,7 +124,7 @@ function newConnection(socket) {
                     tempData[(x + (y / CHUNKSIZE))] = chunk.data[(x + (y / CHUNKSIZE))];
                 }
             }
-            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData});
+            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects});
         }
     } catch (e) {
         console.log(e);
