@@ -53,13 +53,28 @@ class Chunk{
 }
 
 class Placeable{
-    constructor(x,y,rot){
+    constructor(x,y,rot,w,h,z){
         this.pos = {x: x, y: y};
         this.rot = rot;
+        this.size = {w: w, h: h};
         this.openBool = true;
+        this.deleteTag = false;
+        this.z = z;
     }
 
 
 }
 
-module.exports = {Map, Chunk, Placeable, TILESIZE, CHUNKSIZE };
+class Trap extends Placeable{
+    constructor(x,y,rot, health, id, color, ownerName){
+        super(x,y,rot,30,20,1);
+        this.hp = health;
+        this.mhp = 10;
+        this.id = id;
+        this.name = ownerName;
+        this.color = color;
+        this.type = "trap";
+    }
+}
+
+module.exports = {Map, Chunk, Placeable, Trap, TILESIZE, CHUNKSIZE };

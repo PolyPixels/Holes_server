@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { Map, Chunk, Placeable, Trap, TILESIZE, CHUNKSIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -93,22 +93,29 @@ function newConnection(socket) {
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
 
-        socket.on("spawn_trap", spawnTrap);
-
-        function spawnTrap(data){
-            console.log("spawn trap  ", data)
-            traps.push(data)
-            socket.broadcast.emit("spawn_trap", data);
-        }
-
         socket.on("new_object", new_object);
 
         function new_object(data){
             let chunk = serverMap.getChunk(data.cx, data.cy);
-            let temp = new Placeable(data.pos.x, data.pos.y, data.rot);
+            let temp = new Placeable(data.pos.x, data.pos.y, data.rot, data.w, data.h, data.z);
+            if(data.type == "trap"){
+                temp = new Trap(data.pos.x, data.pos.y, data.rot, data.hp, data.id, data.color, data.name);
+            }
             chunk.objects.push(temp);
 
             socket.broadcast.emit("NEW_OBJECT", data);
+        }
+
+        socket.on("delete_obj", delete_obj);
+
+        function delete_obj(data){
+            let chunk = serverMap.getChunk(data.cx, data.cy);
+            for(let i = chunk.objects.length-1; i >= 0; i--){
+                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.type == chunk.objects[i].type){
+                    socket.broadcast.emit("DELETE_OBJ", data);
+                    chunk.objects.splice(i, 1);
+                }
+            }
         }
 
         socket.on("get_chunk", get_chunk);
