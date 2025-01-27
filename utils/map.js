@@ -52,6 +52,14 @@ class Chunk{
     }
 }
 
+/*
+Z heights:
+    3=decorations (ex. mugs, plates, flowers, papers)
+    2=walls,doors,tables,chairs,chests
+    1=rugs,traps
+    0=floors
+*/
+
 class Placeable{
     constructor(x,y,rot,w,h,z){
         this.pos = {x: x, y: y};
@@ -77,4 +85,45 @@ class Trap extends Placeable{
     }
 }
 
-module.exports = {Map, Chunk, Placeable, Trap, TILESIZE, CHUNKSIZE };
+class Cup extends Placeable{
+    constructor(x,y,rot,color){
+        super(x,y,rot, 10, 10, 3);
+        this.color = color;
+        this.type = "cup";
+    }
+}
+
+class Wall extends Placeable{
+    constructor(x,y,rot,color){
+        super(x,y,rot, 60, 60, 2);
+        this.color = color;
+        this.type = "wall";
+    }
+}
+
+class Door extends Placeable{
+    constructor(x,y,rot,color){
+        super(x,y,rot, 20, 60, 2);
+        this.color = color;
+        this.type = "door";
+        this.open = false;
+    }
+}
+
+class Rug extends Placeable{
+    constructor(x,y,rot,color){
+        super(x,y,rot, 80, 80, 1);
+        this.color = color;
+        this.type = "rug";
+    }
+}
+
+class Floor extends Placeable{
+    constructor(x,y,rot,color){
+        super(x,y,rot, 60, 60, 0);
+        this.color = color;
+        this.type = "floor";
+    }
+}
+
+module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, TILESIZE, CHUNKSIZE };

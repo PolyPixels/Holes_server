@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, Placeable, Trap, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, TILESIZE, CHUNKSIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -97,9 +97,27 @@ function newConnection(socket) {
 
         function new_object(data){
             let chunk = serverMap.getChunk(data.cx, data.cy);
-            let temp = new Placeable(data.pos.x, data.pos.y, data.rot, data.w, data.h, data.z);
+            let temp;
             if(data.type == "trap"){
-                temp = new Trap(data.pos.x, data.pos.y, data.rot, data.hp, data.id, data.color, data.name);
+                temp = new Trap(data.pos.x, data.pos.y, data.rot, data.hp, data.ownerId, data.color, data.ownerName);
+            }
+            else if(data.type == "wall"){
+                temp = new Wall(data.pos.x, data.pos.y, data.rot, data.color);
+            }
+            else if(data.type == "door"){
+                temp = new Door(data.pos.x, data.pos.y, data.rot, data.color);
+            }
+            else if(data.type == "floor"){
+                temp = new Floor(data.pos.x, data.pos.y, data.rot, data.color);
+            }
+            else if(data.type == "rug"){
+                temp = new Rug(data.pos.x, data.pos.y, data.rot, data.color);
+            }
+            else if(data.type == "cup"){
+                temp = new Cup(data.pos.x, data.pos.y, data.rot, data.color);
+            }
+            else{
+                temp = new Placeable(data.pos.x, data.pos.y, data.rot);
             }
             chunk.objects.push(temp);
 
