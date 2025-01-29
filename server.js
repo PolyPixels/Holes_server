@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESIZE, CHUNKSIZE } = require('./utils/map');
 
 const port = 3000;
 const app = express();
@@ -116,6 +116,9 @@ function newConnection(socket) {
             else if(data.type == "cup"){
                 temp = new Cup(data.pos.x, data.pos.y, data.rot, data.color);
             }
+            else if(data.type == "turret"){
+                temp = new Turret(data.pos.x, data.pos.y, data.rot, data.hp, data.ownerId, data.color, data.ownerName);
+            }
             else{
                 temp = new Placeable(data.pos.x, data.pos.y, data.rot);
             }
@@ -132,6 +135,18 @@ function newConnection(socket) {
                 if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.type == chunk.objects[i].type){
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
+                }
+            }
+        }
+
+        socket.on("update_obj", update_obj);
+
+        function update_obj(data){
+            let chunk = serverMap.getChunk(data.cx, data.cy);
+            for(let i = chunk.objects.length-1; i >= 0; i--){
+                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.type == chunk.objects[i].type){
+                    chunk.objects[i][data.update_name] = data.update_value;
+                    socket.broadcast.emit("UPDATE_OBJ", data);
                 }
             }
         }

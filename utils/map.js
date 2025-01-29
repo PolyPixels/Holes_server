@@ -126,4 +126,16 @@ class Floor extends Placeable{
     }
 }
 
-module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, TILESIZE, CHUNKSIZE };
+class Turret extends Placeable{
+    constructor(x,y,rot, health, id, color, ownerName){
+        super(x,y,rot, 40,40,2);
+        this.hp = health;
+        this.mhp = 10;
+        this.id = id;
+        this.name = ownerName;
+        this.color = color;
+        this.type = "turret";
+    }
+}
+
+module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESIZE, CHUNKSIZE };
