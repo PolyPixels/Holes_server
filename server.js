@@ -14,17 +14,18 @@ app.use(cors({
     credentials: true
 }));
 
-// Serve static files
-app.use(express.static('../Holes_client'));
+const path = require('path');
 
-const server = app.listen(port, () => {
-    console.log("Server is running on port: " + port);
+// Serve static files using an absolute path
+app.use(express.static(path.join(__dirname, '../Holes_Client')));
+const server = app.listen(port, '0.0.0.0', () => {
+    console.log(`Server is running on http://54.91.39.132:${port}`);
 });
 
 // Configure Socket.io with CORS
 const io = socket(server, {
     cors: {
-        origin: 'http://127.0.0.1:5500',
+        origin: '*',
         methods: ['GET', 'POST'],
         credentials: true
     }
