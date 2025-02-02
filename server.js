@@ -39,6 +39,7 @@ const traps = []
 const serverMap = new Map();
 
 app.get('/status', (req, res) => {
+    console.log("status")
     res.json({
         status: "Online",
         playerCount: Object.keys(players).length
