@@ -7,9 +7,10 @@ const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESI
 const port = 3000;
 const app = express();
 
+
 // Use CORS middleware
 app.use(cors({
-    origin: 'http://127.0.0.1:5500',
+    origin: '*',
     methods: ['GET', 'POST'],
     credentials: true
 }));
@@ -19,7 +20,7 @@ const path = require('path');
 // Serve static files using an absolute path
 app.use(express.static(path.join(__dirname, '../Holes_Client')));
 const server = app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is running on http://54.91.39.132:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });
 
 // Configure Socket.io with CORS
@@ -36,6 +37,13 @@ io.sockets.on('connection', newConnection);
 const players = {}; // All players
 const traps = []
 const serverMap = new Map();
+
+app.get('/status', (req, res) => {
+    res.json({
+        status: "Online",
+        playerCount: Object.keys(players).length
+    });
+});
 
 function newConnection(socket) {
     try {
