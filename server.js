@@ -6,7 +6,7 @@ const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESI
 const { getGlobals } = require("./globals"); // Ensure correct import
 
 const globals = getGlobals(); // Now it correctly retrieves global variables
-let { players, traps, serverMap } = globals;
+let { players, traps,serverMap} = globals;
 
 const allRoutes = require('./api/routes/Routes');
 const port = 3000;

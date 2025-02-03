@@ -1,7 +1,8 @@
+const {Map} = require("./utils/map")
+
 let players = {};
 let traps = {};
-let serverMap = {};
-
+let serverMap = new Map()
 function getGlobals() {
     return { players, traps, serverMap };
 }
