@@ -23,7 +23,7 @@ class Map{
 class Chunk{
     constructor(x,y){
         this.data = []; // Data is very obvious, -1 is unbreakable, 0 is nothing, >0 is block
-        this.NOISE_SCALE = TILESIZE * 0.005; //changing the multiplication number changes the size of natual air pockets
+        this.NOISE_SCALE = TILESIZE * 0.004; //changing the multiplication number changes the size of natual air pockets
         this.cx = x;
         this.cy = y;
         this.objects = [];
