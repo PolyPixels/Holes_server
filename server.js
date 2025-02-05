@@ -3,7 +3,12 @@ const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
 const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { getGlobals } = require("./globals"); // Ensure correct import
 
+const globals = getGlobals(); // Now it correctly retrieves global variables
+let { players, traps,serverMap} = globals;
+
+const allRoutes = require('./api/routes/Routes');
 const port = 3000;
 const app = express();
 
@@ -34,17 +39,9 @@ const io = socket(server, {
 
 io.sockets.on('connection', newConnection);
 
-const players = {}; // All players
-const traps = []
-const serverMap = new Map();
 
-app.get('/status', (req, res) => {
-    console.log("status")
-    res.json({
-        status: "Online",
-        playerCount: Object.keys(players).length
-    });
-});
+app.use(allRoutes);
+
 
 function newConnection(socket) {
     try {
