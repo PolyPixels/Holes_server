@@ -1,7 +1,7 @@
 const { createNoise2D } = require('simplex-noise');
 const noise2D = createNoise2D();
 
-const TILESIZE = 16;
+const TILESIZE = 32;
 const CHUNKSIZE = 50;
 
 class Map{
@@ -23,7 +23,7 @@ class Map{
 class Chunk{
     constructor(x,y){
         this.data = []; // Data is very obvious, -1 is unbreakable, 0 is nothing, >0 is block
-        this.NOISE_SCALE = TILESIZE * 0.009; //changing the multiplication number changes the size of natual air pockets
+        this.NOISE_SCALE = TILESIZE * 0.005; //changing the multiplication number changes the size of natual air pockets
         this.cx = x;
         this.cy = y;
         this.objects = [];
