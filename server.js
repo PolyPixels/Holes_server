@@ -73,13 +73,17 @@ function newConnection(socket) {
         players[data.id].pos = data.pos;
         players[data.id].hp = data.hp;
         players[data.id].holding = data.holding;
+        players[data.id].animationType = data.animationType;
+        players[data.id].animationFrame = data.animationFrame;
     
         // Broadcast the updated position to other clients
         socket.broadcast.emit("UPDATE_POS", {
             id: data.id,
             pos: data.pos,
             hp: data.hp,
-            holding: data.holding
+            holding: data.holding,
+            animationType: data.animationType,
+            animationFrame: data.animationFrame
         });
       }
       
