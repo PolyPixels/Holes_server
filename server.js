@@ -12,13 +12,13 @@ const allRoutes = require('./api/routes/Routes');
 const port = 3000;
 const app = express();
 
-
-// Use CORS middleware
 app.use(cors({
-    origin: '*',
+    origin: true,  // This automatically reflects the request's origin
     methods: ['GET', 'POST'],
     credentials: true
 }));
+
+
 
 const path = require('path');
 
