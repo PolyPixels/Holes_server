@@ -2,7 +2,7 @@ const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
 const { validColors } = require('./utils/color');
-const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESIZE, CHUNKSIZE } = require('./utils/map');
+const { Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, Bomb, TILESIZE, CHUNKSIZE } = require('./utils/map');
 const { getGlobals } = require("./globals"); // Ensure correct import
 
 const globals = getGlobals(); // Now it correctly retrieves global variables
@@ -73,13 +73,17 @@ function newConnection(socket) {
         players[data.id].pos = data.pos;
         players[data.id].hp = data.hp;
         players[data.id].holding = data.holding;
+        players[data.id].animationType = data.animationType;
+        players[data.id].animationFrame = data.animationFrame;
     
         // Broadcast the updated position to other clients
         socket.broadcast.emit("UPDATE_POS", {
             id: data.id,
             pos: data.pos,
             hp: data.hp,
-            holding: data.holding
+            holding: data.holding,
+            animationType: data.animationType,
+            animationFrame: data.animationFrame
         });
       }
       
@@ -125,6 +129,9 @@ function newConnection(socket) {
             }
             else if(data.type == "turret"){
                 temp = new Turret(data.pos.x, data.pos.y, data.rot, data.hp, data.ownerId, data.color, data.ownerName);
+            }
+            else if(data.type == "bomb"){
+                temp = new Bomb(data.pos.x, data.pos.y, data.rot, data.hp, data.ownerId, data.color, data.ownerName);
             }
             else{
                 temp = new Placeable(data.pos.x, data.pos.y, data.rot);

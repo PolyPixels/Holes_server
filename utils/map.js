@@ -85,6 +85,18 @@ class Trap extends Placeable{
     }
 }
 
+class Bomb extends Placeable{
+    constructor(x,y,rot, health, id, color, ownerName){
+        super(x,y,0,30,20,1);
+        this.hp = health;
+        this.mhp = 10;
+        this.id = id;
+        this.name = ownerName;
+        this.color = color;
+        this.type = "bomb";
+    }
+}
+
 class Cup extends Placeable{
     constructor(x,y,rot,color){
         super(x,y,rot, 10, 10, 3);
@@ -138,4 +150,4 @@ class Turret extends Placeable{
     }
 }
 
-module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, TILESIZE, CHUNKSIZE };
+module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, Bomb, TILESIZE, CHUNKSIZE };
