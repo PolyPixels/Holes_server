@@ -112,6 +112,12 @@ The server includes a noise-based map generation system. Each map is dynamically
 
 ---
 
+# ENVs
+```
+SERVER_LOGO
+SERVER_NAME
+```
+
 ## Troubleshooting
 
 ### CORS Errors
