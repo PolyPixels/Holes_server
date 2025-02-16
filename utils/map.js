@@ -52,16 +52,9 @@ class Chunk{
     }
 }
 
-/*
-Z heights:
-    3=decorations (ex. mugs, plates, flowers, papers)
-    2=walls,doors,tables,chairs,chests
-    1=rugs,traps
-    0=floors
-*/
-
 class Placeable{
-    constructor(x,y,rot,w,h,z){
+    constructor(objName,x,y,rot,w,h,z){
+        this.objName = objName;
         this.pos = {x: x, y: y};
         this.rot = rot;
         this.size = {w: w, h: h};
@@ -69,85 +62,6 @@ class Placeable{
         this.deleteTag = false;
         this.z = z;
     }
-
-
 }
 
-class Trap extends Placeable{
-    constructor(x,y,rot, health, id, color, ownerName){
-        super(x,y,rot,30,20,1);
-        this.hp = health;
-        this.mhp = 10;
-        this.id = id;
-        this.name = ownerName;
-        this.color = color;
-        this.type = "trap";
-    }
-}
-
-class Bomb extends Placeable{
-    constructor(x,y,rot, health, id, color, ownerName){
-        super(x,y,0,30,20,1);
-        this.hp = health;
-        this.mhp = 10;
-        this.id = id;
-        this.name = ownerName;
-        this.color = color;
-        this.type = "bomb";
-    }
-}
-
-class Cup extends Placeable{
-    constructor(x,y,rot,color){
-        super(x,y,rot, 10, 10, 3);
-        this.color = color;
-        this.type = "cup";
-    }
-}
-
-class Wall extends Placeable{
-    constructor(x,y,rot,color){
-        super(x,y,rot, 60, 60, 2);
-        this.color = color;
-        this.type = "wall";
-    }
-}
-
-class Door extends Placeable{
-    constructor(x,y,rot,color){
-        super(x,y,rot, 20, 60, 2);
-        this.color = color;
-        this.type = "door";
-        this.open = false;
-    }
-}
-
-class Rug extends Placeable{
-    constructor(x,y,rot,color){
-        super(x,y,rot, 80, 80, 1);
-        this.color = color;
-        this.type = "rug";
-    }
-}
-
-class Floor extends Placeable{
-    constructor(x,y,rot,color){
-        super(x,y,rot, 60, 60, 0);
-        this.color = color;
-        this.type = "floor";
-    }
-}
-
-class Turret extends Placeable{
-    constructor(x,y,rot, health, id, color, ownerName){
-        super(x,y,rot, 40,40,2);
-        this.hp = health;
-        this.mhp = 10;
-        this.id = id;
-        this.name = ownerName;
-        this.color = color;
-        this.type = "turret";
-    }
-}
-
-module.exports = {Map, Chunk, Placeable, Trap, Wall, Door, Cup, Rug, Floor, Turret, Bomb, TILESIZE, CHUNKSIZE };
+module.exports = {Map, Chunk, Placeable, TILESIZE, CHUNKSIZE };
