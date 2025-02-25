@@ -6,7 +6,7 @@ const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
 const { getGlobals } = require("./globals"); // Ensure correct import
 
 const globals = getGlobals(); // Now it correctly retrieves global variables
-let { players, traps,serverMap} = globals;
+let { players, traps,serverMap,chatMessages} = globals;
 
 const allRoutes = require('./api/routes/Routes');
 const port = 3000;
@@ -154,28 +154,51 @@ function newConnection(socket) {
         }
 
 
-        //chats sockets
         socket.on("send_message", send_message);
 
-        function send_message(data){
-            let pos = data.split(",");
-            pos[0] = parseInt(pos[0]);
-            pos[1] = parseInt(pos[1]);
-
-            //
-            io.to(socket.id).emit("SEND_MESSAGE", {});
+        function send_message(data) {
+            // Expecting data in the format "x,y,message"
+            let parts = data.split(",");
+            let x = parseFloat(parts[0]);
+            let y = parseFloat(parts[1]);
+            let message = parts.slice(2).join(","); // Joins remaining parts in case the message contains commas.
+            
+            // Retrieve the sender's name if available; otherwise, fallback to socket.id.
+            let user = players[socket.id] && players[socket.id].name ? players[socket.id].name : socket.id;
+            
+            // Create the chat message object.
+            let chatMsg = { message, x, y, user };
+            
+            // Save the message
+            chatMessages.push(chatMsg);
+            
+            // Optionally, broadcast the new chat message to all connected clients.
+            io.emit("NEW_CHAT_MESSAGE", chatMsg);
         }
-
+        
         socket.on("get_messages", get_messages);
 
-        function get_messages(data){
-            let pos = data.split(",");
-            pos[0] = parseInt(pos[0]);
-            pos[1] = parseInt(pos[1]);
-
-            //
-            io.to(socket.id).emit("GET_MESSAGES", {});
+        function get_messages(data) {
+            // Expecting data in the format "x,y" representing the player's current position
+            let parts = data.split(",");
+            let userX = parseFloat(parts[0]);
+            let userY = parseFloat(parts[1]);
+            
+            // Use the player's hearing range, defaulting to 0 if not set.
+            let hearingRange = players[socket.id] && players[socket.id].hearing ? players[socket.id].hearing : 0;
+            
+            // Filter messages based on the distance from the player's current position.
+            let inRangeMessages = chatMessages.filter(msg => {
+                let dx = msg.x - userX;
+                let dy = msg.y - userY;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                return distance <= hearingRange;
+            });
+            
+            // Send the filtered messages back to the requesting client.
+            io.to(socket.id).emit("GET_MESSAGES", inRangeMessages);
         }
+        
     } catch (e) {
         console.log(e);
     }
