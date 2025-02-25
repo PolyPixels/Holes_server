@@ -152,6 +152,30 @@ function newConnection(socket) {
             }
             io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects});
         }
+
+
+        //chats sockets
+        socket.on("send_message", send_message);
+
+        function send_message(data){
+            let pos = data.split(",");
+            pos[0] = parseInt(pos[0]);
+            pos[1] = parseInt(pos[1]);
+
+            //
+            io.to(socket.id).emit("SEND_MESSAGE", {});
+        }
+
+        socket.on("get_messages", get_messages);
+
+        function get_messages(data){
+            let pos = data.split(",");
+            pos[0] = parseInt(pos[0]);
+            pos[1] = parseInt(pos[1]);
+
+            //
+            io.to(socket.id).emit("GET_MESSAGES", {});
+        }
     } catch (e) {
         console.log(e);
     }
