@@ -157,7 +157,7 @@ function newConnection(socket) {
         socket.on("send_message", send_message);
 
         function send_message(data) {
-            console.log("send", data);
+            //console.log("send", data);
             // Expecting data in the format "x,y,message"
             let parts = data.split(",");
             let x = parseFloat(parts[0]);
@@ -171,24 +171,24 @@ function newConnection(socket) {
             let chatMsg = { message, x, y, user };
             
 
-            console.log("send", chatMsg);
+            //console.log("send", chatMsg);
             
             // For each connected player, check if they are within hearing distance.
             for (let id in players) {
-                console.log(id)
+                //console.log(id)
                 if (players.hasOwnProperty(id)) {
                     let player = players[id];
-                    console.log(id)
+                    //console.log(id)
                     // Ensure player has a position and hearing range defined
                     if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
-                        console.log("num")
+                        //console.log("num")
                         let dx = player.pos.x - x;
                         let dy = player.pos.y - y;
                         let distance = Math.sqrt(dx * dx + dy * dy);
-                        console.log("NUMBERS",distance, player.statBlock.stats.hearing*20)
+                        //console.log("NUMBERS",distance, player.statBlock.stats.hearing*20)
                         // If the player is within their hearing range, send the chat message.
                         if (distance <=player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange) {
-                            console.log("???????",chatMsg)
+                            //console.log("???????",chatMsg)
                             io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
                         }
                     }
