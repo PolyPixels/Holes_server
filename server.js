@@ -157,11 +157,12 @@ function newConnection(socket) {
         socket.on("send_message", send_message);
 
         function send_message(data) {
+            console.log("send", data);
             // Expecting data in the format "x,y,message"
             let parts = data.split(",");
             let x = parseFloat(parts[0]);
             let y = parseFloat(parts[1]);
-            let message = parts.slice(2).join(","); // Joins remaining parts in case the message contains commas.
+            let message = parts.slice(2).join(","); // Handles commas in the message
             
             // Retrieve the sender's name if available; otherwise, fallback to socket.id.
             let user = players[socket.id] && players[socket.id].name ? players[socket.id].name : socket.id;
@@ -169,36 +170,33 @@ function newConnection(socket) {
             // Create the chat message object.
             let chatMsg = { message, x, y, user };
             
-            // Save the message
-            chatMessages.push(chatMsg);
-            
-            // Optionally, broadcast the new chat message to all connected clients.
-            io.emit("NEW_CHAT_MESSAGE", chatMsg);
-        }
-        
-        socket.on("get_messages", get_messages);
 
-        function get_messages(data) {
-            // Expecting data in the format "x,y" representing the player's current position
-            let parts = data.split(",");
-            let userX = parseFloat(parts[0]);
-            let userY = parseFloat(parts[1]);
+            console.log("send", chatMsg);
             
-            // Use the player's hearing range, defaulting to 0 if not set.
-            let hearingRange = players[socket.id] && players[socket.id].hearing ? players[socket.id].hearing : 0;
-            
-            // Filter messages based on the distance from the player's current position.
-            let inRangeMessages = chatMessages.filter(msg => {
-                let dx = msg.x - userX;
-                let dy = msg.y - userY;
-                let distance = Math.sqrt(dx * dx + dy * dy);
-                return distance <= hearingRange;
-            });
-            
-            // Send the filtered messages back to the requesting client.
-            io.to(socket.id).emit("GET_MESSAGES", inRangeMessages);
+            // For each connected player, check if they are within hearing distance.
+            for (let id in players) {
+                console.log(id)
+                if (players.hasOwnProperty(id)) {
+                    let player = players[id];
+                    console.log(id)
+                    // Ensure player has a position and hearing range defined
+                    if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
+                        console.log("num")
+                        let dx = player.pos.x - x;
+                        let dy = player.pos.y - y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        console.log("NUMBERS",distance, player.statBlock.stats.hearing*20)
+                        // If the player is within their hearing range, send the chat message.
+                        if (distance <=player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange) {
+                            console.log("???????",chatMsg)
+                            io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
+                        }
+                    }
+                }
+            }
         }
         
+   
     } catch (e) {
         console.log(e);
     }
