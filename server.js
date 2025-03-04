@@ -187,7 +187,7 @@ function newConnection(socket) {
                         let distance = Math.sqrt(dx * dx + dy * dy);
                         //console.log("NUMBERS",distance, player.statBlock.stats.hearing*20)
                         // If the player is within their hearing range, send the chat message.
-                        if (distance <=player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange) {
+                        if (distance <= 5000+(player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange)) {
                             //console.log("???????",chatMsg)
                             io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
                         }
