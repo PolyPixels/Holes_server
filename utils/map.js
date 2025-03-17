@@ -27,6 +27,7 @@ class Chunk{
         this.cx = x;
         this.cy = y;
         this.objects = [];
+        this.projectiles = [];
     }
 
     generate(){
