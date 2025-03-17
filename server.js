@@ -71,7 +71,7 @@ function newConnection(socket) {
       
         // Only update mutable properties (dynamic data like position, health, etc.)
         players[data.id].pos = data.pos;
-        players[data.id].hp = data.hp;
+        players[data.id].statBlock.stats.hp = data.statBlock.stats.hp;
         players[data.id].holding = data.holding;
         players[data.id].animationType = data.animationType;
         players[data.id].animationFrame = data.animationFrame;
@@ -80,7 +80,7 @@ function newConnection(socket) {
         socket.broadcast.emit("UPDATE_POS", {
             id: data.id,
             pos: data.pos,
-            hp: data.hp,
+            hp: data.statBlock.stats.hp,
             holding: data.holding,
             animationType: data.animationType,
             animationFrame: data.animationFrame
@@ -137,6 +137,32 @@ function newConnection(socket) {
             }
         }
 
+        socket.on("new_proj", new_projectile);
+
+        function new_projectile(data){
+            //add projectiles to server map
+            let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
+            chunk.projectiles.push(data);
+            socket.broadcast.emit("NEW_PROJECTILE", data);
+        }
+
+        socket.on("delete_proj", delete_projectile);
+
+        function delete_projectile(data){
+            let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
+            for(let i = chunk.projectiles.length-1; i >= 0; i--){
+                if(
+                    data.id == chunk.projectiles[i].id &&
+                    data.lifeSpan == chunk.projectiles[i].lifeSpan &&
+                    data.name == chunk.projectiles[i].name &&
+                    data.ownerName == chunk.projectiles[i].ownerName
+                ){
+                    socket.broadcast.emit("DELETE_PROJ", data);
+                    chunk.projectiles.splice(i, 1);
+                }
+            }
+        }
+
         socket.on("get_chunk", get_chunk);
 
         function get_chunk(data){
@@ -150,7 +176,7 @@ function newConnection(socket) {
                     tempData[(x + (y / CHUNKSIZE))] = chunk.data[(x + (y / CHUNKSIZE))];
                 }
             }
-            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects});
+            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects, projectiles: chunk.projectiles});
         }
 
 
