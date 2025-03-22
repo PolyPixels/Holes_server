@@ -134,7 +134,7 @@ function newConnection(socket) {
         function update_obj(data){
             let chunk = serverMap.getChunk(data.cx, data.cy);
             for(let i = chunk.objects.length-1; i >= 0; i--){
-                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.type == chunk.objects[i].type){
+                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
                     chunk.objects[i][data.update_name] = data.update_value;
                     socket.broadcast.emit("UPDATE_OBJ", data);
                 }
