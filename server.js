@@ -90,6 +90,10 @@ function newConnection(socket) {
         socket.on("update_node", update_map);
 
         function update_map(data) {
+            let chunkPos = data.chunkPos.split(",");
+            chunkPos[0] = parseInt(chunkPos[0]);
+            chunkPos[1] = parseInt(chunkPos[1]);
+            serverMap.getChunk(chunkPos[0], chunkPos[1]);
             serverMap.chunks[data.chunkPos].data[data.index] = data.val;
             socket.broadcast.emit("UPDATE_NODE", data);
         }
