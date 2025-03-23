@@ -93,8 +93,8 @@ function newConnection(socket) {
             let chunkPos = data.chunkPos.split(",");
             chunkPos[0] = parseInt(chunkPos[0]);
             chunkPos[1] = parseInt(chunkPos[1]);
-            serverMap.getChunk(chunkPos[0], chunkPos[1]);
-            serverMap.chunks[data.chunkPos].data[data.index] = data.val;
+            let chunk = serverMap.getChunk(chunkPos[0], chunkPos[1]);
+            chunk.data[data.index] = data.val;
             socket.broadcast.emit("UPDATE_NODE", data);
         }
 
@@ -122,7 +122,7 @@ function newConnection(socket) {
         function delete_obj(data){
             let chunk = serverMap.getChunk(data.cx, data.cy);
             for(let i = chunk.objects.length-1; i >= 0; i--){
-                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.type == chunk.objects[i].type){
+                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
                 }
