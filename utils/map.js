@@ -50,6 +50,32 @@ class Chunk{
                 if (this.data[index] < CUT_OFF) this.data[index] = 0; //air pockets
             }
         }
+
+        //add trees
+        if(Math.random() < 0.2){
+            let treeX = Math.floor(Math.random()*CHUNKSIZE);
+            let treeY = Math.floor(Math.random()*CHUNKSIZE);
+            if(Math.random() < 0.5){
+                this.objects.push(new Placeable("AppleTree", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+            }
+            else{
+                let possibleites = [-3,-2,-1,1,2,3];
+                let randX1 = possibleites[Math.floor(Math.random()*possibleites.length)];
+                let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
+                let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
+                let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
+                this.objects.push(new Placeable("Mushroom", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+                this.objects.push(new Placeable("Mushroom", (treeX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+                this.objects.push(new Placeable("Mushroom", (treeX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+            }
+            for(let x = treeX-5; x < treeX+5; x++){
+                for(let y = treeY-5; y < treeY+5; y++){
+                    if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
+                        this.data[x + (y / CHUNKSIZE)] = 0;
+                    }
+                }
+            }
+        }
     }
 }
 
