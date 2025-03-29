@@ -58,7 +58,7 @@ function newConnection(socket) {
             players[data.id] = data;
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
-            socket.broadcast.emit("NEW_CHAT_MESSAGE", {message: ServerWelcomeMessage + " " + data.name, x:0,y:0 , user:"SERVER"});
+            io.emit("NEW_CHAT_MESSAGE", {message: ServerWelcomeMessage + " " + data.name, x:0,y:0 , user:"SERVER"});
         }
 
         socket.on("update_pos", update_pos);
@@ -228,9 +228,9 @@ function newConnection(socket) {
 
         //death sockets Player_Dies
         socket.on("player_dies", (data) => {
-            console.log(data)
-            const { x, y, id, ownerName, name } = data;
-            console.log("die mentions",x,y)
+            console.log(data);
+            const { x, y, id, attacker, name } = data;
+            console.log("die mentions",x,y,id,attacker,name);
             // Mark the player as dead in the server-side state (optional, depends on your logic)
             if (players[id]) {
                 players[id].isDead = true; // or players[id].status = "dead", etc.
@@ -246,8 +246,8 @@ function newConnection(socket) {
                         let distance = Math.sqrt(dx * dx + dy * dy);
                         console.log(distance)
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
-                            console.log(name + "Has been killed by " + owner , x,y )
-                            socket.broadcast.emit("NEW_CHAT_MESSAGE", {message: name + "Has been killed by " + ownerName , x,y , user:"SERVER"});
+                            console.log(name + " Has been killed by " + attacker , x,y )
+                            io.emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
                         }else{
                             console.log("s2")
                         }
