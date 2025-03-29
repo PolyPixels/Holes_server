@@ -18,8 +18,7 @@ app.use(cors({
     credentials: true
 }));
 
-
-
+const ServerWelcomeMessage = process.env.Welcome || "Please Welcome";
 const path = require('path');
 
 // Serve static files using an absolute path
@@ -59,6 +58,7 @@ function newConnection(socket) {
             players[data.id] = data;
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
+            socket.broadcast.emit("NEW_CHAT_MESSAGE", {message: ServerWelcomeMessage + " " + data.name, x:0,y:0 , user:"SERVER"});
         }
 
         socket.on("update_pos", update_pos);
@@ -225,6 +225,42 @@ function newConnection(socket) {
                 }
             }
         }
+
+        //death sockets Player_Dies
+        socket.on("player_dies", (data) => {
+            console.log(data)
+            const { x, y, id, ownerName, name } = data;
+            console.log("die mentions",x,y)
+            // Mark the player as dead in the server-side state (optional, depends on your logic)
+            if (players[id]) {
+                players[id].isDead = true; // or players[id].status = "dead", etc.
+            }
+        
+            // Notify all players within range of the death
+            for (let pid in players) {
+                if (players.hasOwnProperty(pid)) {
+                    let player = players[pid];
+                    if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
+                        let dx = player.pos.x - x;
+                        let dy = player.pos.y - y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        console.log(distance)
+                        if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
+                            console.log(name + "Has been killed by " + owner , x,y )
+                            socket.broadcast.emit("NEW_CHAT_MESSAGE", {message: name + "Has been killed by " + ownerName , x,y , user:"SERVER"});
+                        }else{
+                            console.log("s2")
+                        }
+                    }
+                }else{
+                    console.log("????")
+                }
+            }
+        
+            // Instruct all clients to update the player’s render status
+            io.emit("PLAYER_MARKED_DEAD", { id });
+        });
+        
         
    
     } catch (e) {
