@@ -153,8 +153,9 @@ function newConnection(socket) {
         }
 
         socket.on("update_obj", update_obj);
-
+        //optimized 
         function update_obj(data){
+            // cx cy pos{x,y}, update_name,update_value, objName
             let chunk = serverMap.getChunk(data.cx, data.cy);
             for(let i = chunk.objects.length-1; i >= 0; i--){
                 if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
