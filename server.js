@@ -176,6 +176,7 @@ function newConnection(socket) {
         socket.on("delete_proj", delete_projectile);
 
         function delete_projectile(data){
+            // cPos{x,y} id , lifespan name ownerName 
             let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
             for(let i = chunk.projectiles.length-1; i >= 0; i--){
                 if(
@@ -191,8 +192,9 @@ function newConnection(socket) {
         }
 
         socket.on("get_chunk", get_chunk);
-
+        //!! Seems optimal to me
         function get_chunk(data){
+
             let pos = data.split(",");
             pos[0] = parseInt(pos[0]);
             pos[1] = parseInt(pos[1]);
@@ -208,9 +210,8 @@ function newConnection(socket) {
 
 
         socket.on("send_message", send_message);
-
+        // !! Optimal ?
         function send_message(data) {
-            //console.log("send", data);
             // Expecting data in the format "x,y,message"
             let parts = data.split(",");
             let x = parseFloat(parts[0]);
