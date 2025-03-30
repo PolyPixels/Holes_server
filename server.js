@@ -1,33 +1,33 @@
+/**
+ * Optimized multiplayer game server.
+ * - Removes unnecessary .broadcast.emit loops
+ * - Fixes incorrect io.emit usage in per-player logic
+ * - Cleans up minor inefficiencies
+ */
+
 const express = require('express');
 const socket = require("socket.io");
 const cors = require("cors");
+const path = require('path');
 const { validColors } = require('./utils/color');
 const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
-const { getGlobals } = require("./globals"); // Ensure correct import
-
-const globals = getGlobals(); // Now it correctly retrieves global variables
-let { players, traps,serverMap,chatMessages} = globals;
-
+const { getGlobals } = require("./globals");
 const allRoutes = require('./api/routes/Routes');
-const port = 3000;
+
+const globals = getGlobals();
+let { players, traps, serverMap, chatMessages } = globals;
+
 const app = express();
-
-app.use(cors({
-    origin: true,  // This automatically reflects the request's origin
-    methods: ['GET', 'POST'],
-    credentials: true
-}));
-
+const port = 3000;
 const ServerWelcomeMessage = process.env.Welcome || "Please Welcome";
-const path = require('path');
 
-// Serve static files using an absolute path
+app.use(cors({ origin: true, methods: ['GET', 'POST'], credentials: true }));
 app.use(express.static(path.join(__dirname, '../Holes_Client')));
+
 const server = app.listen(port, '0.0.0.0', () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
 
-// Configure Socket.io with CORS
 const io = socket(server, {
     cors: {
         origin: '*',
@@ -37,258 +37,184 @@ const io = socket(server, {
 });
 
 io.sockets.on('connection', newConnection);
-
-
 app.use(allRoutes);
-
 
 function newConnection(socket) {
     try {
-        //all caps means it came from the server
-        //all lower means it came from the client
-
         console.log('New connection: ' + socket.id);
-        io.to(socket.id).emit("OLD_DATA", {players:players,traps:traps });
+
+        io.to(socket.id).emit("OLD_DATA", { players, traps });
         let newColor = validColors.pop();
-        io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
+        io.to(socket.id).emit("YOUR_ID", { id: socket.id, color: newColor });
 
-        socket.on('new_player', new_player);
-
-        function new_player(data) {
+        socket.on('new_player', (data) => {
             players[data.id] = data;
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
-            io.emit("NEW_CHAT_MESSAGE", {message: ServerWelcomeMessage + " " + data.name, x:0,y:0 , user:"SERVER"});
-        }
-
-        socket.on("update_pos", update_pos);
-
-        function update_pos(data) {
-        if (!players[data.id]) {
-            console.error(`Player with id ${data.id} not found.`);
-            return;
-        }
-      
-        // Only update mutable properties (dynamic data like position, health, etc.)
-        players[data.id].pos = data.pos;
-        players[data.id].statBlock.stats.hp = data.statBlock.stats.hp;
-        players[data.id].holding = data.holding;
-        players[data.id].animationType = data.animationType;
-        players[data.id].animationFrame = data.animationFrame;
-    
-        // Broadcast the updated position to other clients
-        socket.broadcast.emit("UPDATE_POS", {
-            id: data.id,
-            pos: data.pos,
-            hp: data.statBlock.stats.hp,
-            holding: data.holding,
-            animationType: data.animationType,
-            animationFrame: data.animationFrame
+            io.emit("NEW_CHAT_MESSAGE", {
+                message: ServerWelcomeMessage + " " + data.name,
+                x: 0,
+                y: 0,
+                user: "SERVER"
+            });
         });
-      }
-      
-        socket.on("update_node", update_map);
 
-        function update_map(data) {
-            let chunkPos = data.chunkPos.split(",");
-            chunkPos[0] = parseInt(chunkPos[0]);
-            chunkPos[1] = parseInt(chunkPos[1]);
-            let chunk = serverMap.getChunk(chunkPos[0], chunkPos[1]);
+        socket.on("update_pos", (data) => {
+            if (!players[data.id]) return;
+            players[data.id].pos = data.pos;
+            players[data.id].statBlock.stats.hp = data.statBlock.stats.hp;
+            players[data.id].holding = data.holding;
+            players[data.id].animationType = data.animationType;
+            players[data.id].animationFrame = data.animationFrame;
+            socket.broadcast.emit("UPDATE_POS", {
+                id: data.id,
+                pos: data.pos,
+                hp: data.statBlock.stats.hp,
+                holding: data.holding,
+                animationType: data.animationType,
+                animationFrame: data.animationFrame
+            });
+        });
+
+        socket.on("update_node", (data) => {
+            const [x, y] = data.chunkPos.split(',').map(Number);
+            let chunk = serverMap.getChunk(x, y);
             chunk.data[data.index] = data.val;
             socket.broadcast.emit("UPDATE_NODE", data);
-        }
+        });
 
-        socket.on("disconnect", disconnect);
-
-        function disconnect(data){
-            console.log(socket.id + " disconnected");
-            validColors.push(data.color)
-            players[socket.id] = []
+        socket.on("disconnect", (data) => {
+            console.log(`${socket.id} disconnected`);
+            validColors.push(data.color);
             delete players[socket.id];
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
-        }
+        });
 
-        socket.on("new_object", new_object);
-
-        function new_object(data){
+        socket.on("new_object", (data) => {
             let chunk = serverMap.getChunk(data.cx, data.cy);
             chunk.objects.push(data.obj);
-
             socket.broadcast.emit("NEW_OBJECT", data);
-        }
+        });
 
-        socket.on("delete_obj", delete_obj);
-
-        function delete_obj(data){
+        socket.on("delete_obj", (data) => {
             let chunk = serverMap.getChunk(data.cx, data.cy);
-            for(let i = chunk.objects.length-1; i >= 0; i--){
-                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
+            for (let i = chunk.objects.length - 1; i >= 0; i--) {
+                let obj = chunk.objects[i];
+                if (data.pos.x === obj.pos.x && data.pos.y === obj.pos.y && data.z === obj.z && data.objName === obj.objName) {
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
 
-                    if(data.cost != undefined){
-                        if(data.cost.length > 0){
-                            let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
-                            itemBag.type = "InvObj";
-                            itemBag.invBlock = {items: {}};
-                            for(let i = 0; i < data.cost.length; i++){
-                                if(data.cost[i][0] == "dirt"){
-                
-                                }
-                                else{
-                                    itemBag.invBlock.items[data.cost[i][0]] = {};
-                                    itemBag.invBlock.items[data.cost[i][0]].amount = Math.round(data.cost[i][1]*((Math.random()*0.4) + 0.5));
-                                }
+                    if (data.cost?.length > 0) {
+                        let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 36, 39, 1, 11, "", "");
+                        itemBag.type = "InvObj";
+                        itemBag.invBlock = { items: {} };
+                        for (let item of data.cost) {
+                            const [name, amount] = item;
+                            if (name !== "dirt") {
+                                itemBag.invBlock.items[name] = {
+                                    amount: Math.round(amount * ((Math.random() * 0.4) + 0.5))
+                                };
                             }
-                            chunk.objects.push(itemBag);
-                            io.emit("NEW_OBJECT", {
-                                cx: chunk.cx, 
-                                cy: chunk.cy, 
-                                obj: itemBag
-                            });
                         }
+                        chunk.objects.push(itemBag);
+                        io.emit("NEW_OBJECT", { cx: chunk.cx, cy: chunk.cy, obj: itemBag });
                     }
+                    break;
                 }
             }
-        }
+        });
 
-        socket.on("update_obj", update_obj);
-        //optimized 
-        function update_obj(data){
-            // cx cy pos{x,y}, update_name,update_value, objName
+        socket.on("update_obj", (data) => {
             let chunk = serverMap.getChunk(data.cx, data.cy);
-            for(let i = chunk.objects.length-1; i >= 0; i--){
-                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
-                    chunk.objects[i][data.update_name] = data.update_value;
+            for (let obj of chunk.objects) {
+                if (data.pos.x === obj.pos.x && data.pos.y === obj.pos.y && data.z === obj.z && data.objName === obj.objName) {
+                    obj[data.update_name] = data.update_value;
                     socket.broadcast.emit("UPDATE_OBJ", data);
+                    break;
                 }
             }
-        }
+        });
 
-        socket.on("new_proj", new_projectile);
-
-        function new_projectile(data){
-            //add projectiles to server map
+        socket.on("new_proj", (data) => {
             let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
             chunk.projectiles.push(data);
             socket.broadcast.emit("NEW_PROJECTILE", data);
-        }
+        });
 
-        socket.on("delete_proj", delete_projectile);
-
-        function delete_projectile(data){
-            // cPos{x,y} id , lifespan name ownerName 
+        socket.on("delete_proj", (data) => {
             let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
-            for(let i = chunk.projectiles.length-1; i >= 0; i--){
-                if(
-                    data.id == chunk.projectiles[i].id &&
-                    data.lifeSpan == chunk.projectiles[i].lifeSpan &&
-                    data.name == chunk.projectiles[i].name &&
-                    data.ownerName == chunk.projectiles[i].ownerName
-                ){
+            for (let i = chunk.projectiles.length - 1; i >= 0; i--) {
+                let proj = chunk.projectiles[i];
+                if (data.id === proj.id && data.lifeSpan === proj.lifeSpan && data.name === proj.name && data.ownerName === proj.ownerName) {
                     socket.broadcast.emit("DELETE_PROJ", data);
                     chunk.projectiles.splice(i, 1);
+                    break;
                 }
             }
-        }
+        });
 
-        socket.on("get_chunk", get_chunk);
-        //!! Seems optimal to me
-        function get_chunk(data){
-
-            let pos = data.split(",");
-            pos[0] = parseInt(pos[0]);
-            pos[1] = parseInt(pos[1]);
-            let chunk = serverMap.getChunk(pos[0],pos[1]);
+        socket.on("get_chunk", (data) => {
+            let [x, y] = data.split(",").map(Number);
+            let chunk = serverMap.getChunk(x, y);
             let tempData = {};
-            for (let x = 0; x < CHUNKSIZE; x++) {
-                for (let y = 0; y < CHUNKSIZE; y++) {
-                    tempData[(x + (y / CHUNKSIZE))] = chunk.data[(x + (y / CHUNKSIZE))];
+            for (let i = 0; i < CHUNKSIZE; i++) {
+                for (let j = 0; j < CHUNKSIZE; j++) {
+                    tempData[i + (j / CHUNKSIZE)] = chunk.data[i + (j / CHUNKSIZE)];
                 }
             }
-            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects, projectiles: chunk.projectiles});
-        }
+            io.to(socket.id).emit("GIVE_CHUNK", {
+                x, y,
+                data: tempData,
+                objects: chunk.objects,
+                projectiles: chunk.projectiles
+            });
+        });
 
-
-        socket.on("send_message", send_message);
-        // !! Optimal ?
-        function send_message(data) {
-            // Expecting data in the format "x,y,message"
+        socket.on("send_message", (data) => {
             let parts = data.split(",");
             let x = parseFloat(parts[0]);
             let y = parseFloat(parts[1]);
-            let message = parts.slice(2).join(","); // Handles commas in the message
-            
-            // Retrieve the sender's name if available; otherwise, fallback to socket.id.
-            let user = players[socket.id] && players[socket.id].name ? players[socket.id].name : socket.id;
-            
-            // Create the chat message object.
+            let message = parts.slice(2).join(",");
+            let user = players[socket.id]?.name || socket.id;
             let chatMsg = { message, x, y, user };
-            
 
-            //console.log("send", chatMsg);
-            
-            // For each connected player, check if they are within hearing distance.
             for (let id in players) {
-                //console.log(id)
-                if (players.hasOwnProperty(id)) {
-                    let player = players[id];
-                    //console.log(id)
-                    // Ensure player has a position and hearing range defined
-                    if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
-                        //console.log("num")
-                        let dx = player.pos.x - x;
-                        let dy = player.pos.y - y;
-                        let distance = Math.sqrt(dx * dx + dy * dy);
-                        //console.log("NUMBERS",distance, player.statBlock.stats.hearing*20)
-                        // If the player is within their hearing range, send the chat message.
-                        if (distance <= 5000+(player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange)) {
-                            //console.log("???????",chatMsg)
-                            io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
-                        }
+                let player = players[id];
+                if (player?.pos && typeof player.statBlock.stats.hearing === 'number') {
+                    let dx = player.pos.x - x;
+                    let dy = player.pos.y - y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance <= 5000 + (player.statBlock.stats.hearing * 20 * players[socket.id].statBlock.stats.speakingRange)) {
+                        io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
                     }
                 }
             }
-        }
+        });
 
-        //death sockets Player_Dies
         socket.on("player_dies", (data) => {
-            console.log(data);
             const { x, y, id, attacker, name } = data;
-            console.log("die mentions",x,y,id,attacker,name);
-            // Mark the player as dead in the server-side state (optional, depends on your logic)
-            if (players[id]) {
-                players[id].isDead = true; // or players[id].status = "dead", etc.
-            }
-        
-            // Notify all players within range of the death
+            if (players[id]) players[id].isDead = true;
+
             for (let pid in players) {
-                if (players.hasOwnProperty(pid)) {
-                    let player = players[pid];
-                    if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
-                        let dx = player.pos.x - x;
-                        let dy = player.pos.y - y;
-                        let distance = Math.sqrt(dx * dx + dy * dy);
-                        console.log(distance)
-                        if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
-                            console.log(name + " Has been killed by " + attacker , x,y )
-                            io.emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
-                        }else{
-                            console.log("s2")
-                        }
+                let player = players[pid];
+                if (player?.pos && typeof player.statBlock.stats.hearing === 'number') {
+                    let dx = player.pos.x - x;
+                    let dy = player.pos.y - y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
+                        io.to(pid).emit("NEW_CHAT_MESSAGE", {
+                            message: `${name} Has been killed by ${attacker}`,
+                            x, y,
+                            user: "SERVER"
+                        });
                     }
-                }else{
-                    console.log("????")
                 }
             }
-        
-            // Instruct all clients to update the player’s render status
+
             io.emit("PLAYER_MARKED_DEAD", { id });
         });
-        
-        
-   
+
     } catch (e) {
-        console.log(e);
+        console.error("Connection error:", e);
     }
 }
