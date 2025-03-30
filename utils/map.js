@@ -80,7 +80,7 @@ class Chunk{
 }
 
 class Placeable{
-    constructor(objName,x,y,rot,w,h,z){
+    constructor(objName,x,y,rot,w,h,z,color,ownerName,id){
         this.objName = objName;
         this.pos = {x: x, y: y};
         this.rot = rot;
@@ -88,6 +88,9 @@ class Placeable{
         this.openBool = true;
         this.deleteTag = false;
         this.z = z;
+        this.color = color;
+        this.ownerName = ownerName;
+        this.id = id;
     }
 }
 

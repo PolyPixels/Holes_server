@@ -125,6 +125,29 @@ function newConnection(socket) {
                 if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
+
+                    if(data.cost != undefined){
+                        if(data.cost.length > 0){
+                            let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
+                            itemBag.type = "InvObj";
+                            itemBag.invBlock = {items: {}};
+                            for(let i = 0; i < data.cost.length; i++){
+                                if(data.cost[i][0] == "dirt"){
+                
+                                }
+                                else{
+                                    itemBag.invBlock.items[data.cost[i][0]] = {};
+                                    itemBag.invBlock.items[data.cost[i][0]].amount = Math.round(data.cost[i][1]*((Math.random()*0.4) + 0.5));
+                                }
+                            }
+                            chunk.objects.push(itemBag);
+                            io.emit("NEW_OBJECT", {
+                                cx: chunk.cx, 
+                                cy: chunk.cy, 
+                                obj: itemBag
+                            });
+                        }
+                    }
                 }
             }
         }
