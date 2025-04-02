@@ -308,7 +308,7 @@ setInterval(() => {
     const seconds = countdown % 60;
 
     // Broadcast every minute
-    if (seconds === 0 || countdown <= 60) {
+    if (seconds === 0 || countdown <= 15) {
         console.log("TIME change", minutes, seconds)
         io.emit("sync_time", {
             minutes,
