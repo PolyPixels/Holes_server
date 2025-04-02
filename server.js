@@ -4,9 +4,11 @@ const cors = require("cors");
 const { validColors } = require('./utils/color');
 const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
 const { getGlobals } = require("./globals"); // Ensure correct import
-
+const { exec } = require('child_process');
 const globals = getGlobals(); // Now it correctly retrieves global variables
 let { players, traps,serverMap,chatMessages} = globals;
+
+let countdown = 15 * 60; // 15 minutes in seconds
 
 const allRoutes = require('./api/routes/Routes');
 const port = 3000;
@@ -47,10 +49,14 @@ function newConnection(socket) {
         //all caps means it came from the server
         //all lower means it came from the client
 
+        const minutes = Math.floor(countdown / 60);
+        const seconds = countdown % 60;
         console.log('New connection: ' + socket.id);
         io.to(socket.id).emit("OLD_DATA", {players:players,traps:traps });
         let newColor = validColors.pop();
         io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
+
+        io.to(socket.id).emit("sync_time", {minutes, seconds})
 
         socket.on('new_player', new_player);
 
@@ -263,6 +269,9 @@ function newConnection(socket) {
             for (let pid in players) {
                 if (players.hasOwnProperty(pid)) {
                     let player = players[pid];
+                    if(player.name == attacker){
+                        player.kills +=1;
+                    }
                     if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
                         let dx = player.pos.x - x;
                         let dy = player.pos.y - y;
@@ -280,6 +289,7 @@ function newConnection(socket) {
                 }
             }
         
+
             // Instruct all clients to update the player’s render status
             io.emit("PLAYER_MARKED_DEAD", { id });
         });
@@ -290,3 +300,55 @@ function newConnection(socket) {
         console.log(e);
     }
 }
+
+let resetCalled = false
+setInterval(() => {
+
+    const minutes = Math.floor(countdown / 60);
+    const seconds = countdown % 60;
+
+    // Broadcast every minute
+    if (seconds === 0 || countdown <= 60) {
+        console.log("TIME change", minutes, seconds)
+        io.emit("sync_time", {
+            minutes,
+            seconds
+        });
+    }
+    // At 1 minute left
+    if (countdown === 60) {
+        io.emit("NEW_CHAT_MESSAGE", {
+            message: "⚠️ One minute left!",
+            x: 0,
+            y: 0,
+            user: "TIMER"
+        });
+    }
+
+    // When timer hits 0, reset
+    if (countdown <= 0) {
+
+        if(!resetCalled){
+
+        io.emit("server_ended")
+        resetCalled = true
+        exec('pm2 restart holes-server', (err, stdout, stderr) => {
+            if (err) {
+                console.error(`Restart error: ${err.message}`);
+                return;
+            }
+            console.log(`Server restart stdout: ${stdout}`);
+            console.error(`Server restart stderr: ${stderr}`);
+        });
+        }
+
+        //restart the server 
+    
+        
+        
+    }else {
+
+    countdown--;
+    }
+}, 1000); // Runs every second
+
