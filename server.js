@@ -60,11 +60,21 @@ function newConnection(socket) {
 
         socket.on('new_player', new_player);
         function new_player(data) {
-            let originalName = data.name;
+            const originalName = data.name;
             let name = originalName;
             let suffix = 1;
         
-            // Check for duplicate names
+            // ✅ Basic bad word filter (case-insensitive)
+            const badWords = ['shit', 'fuck', 'bitch', 'cunt', 'nigg', 'asshole', 'cock', 'dick','fag'];
+            const badWordRegex = new RegExp(badWords.join('|'), 'i');
+            
+        
+            // Replace bad words with asterisks or generic fallback
+            if (badWordRegex.test(name)) {
+                name = "Player" + Math.random()
+            }
+        
+            // ✅ Ensure uniqueness
             const nameExists = (n) => {
                 return Object.values(players).some(player => player && player.name === n);
             };
@@ -73,10 +83,12 @@ function newConnection(socket) {
                 name = `${originalName}_${suffix}`;
                 suffix++;
             }
-
-            io.to(socket.id).emit("change_name", name)
         
-            // Update the data with the unique name
+            // ✅ Only notify if the name was changed
+            if (name !== originalName) {
+                io.to(socket.id).emit("change_name", name);
+            }
+        
             data.name = name;
             players[data.id] = data;
         
@@ -89,6 +101,7 @@ function newConnection(socket) {
                 user: "SERVER"
             });
         }
+        
         
 
         socket.on("update_pos", update_pos);
