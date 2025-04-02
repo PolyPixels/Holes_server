@@ -59,13 +59,37 @@ function newConnection(socket) {
         io.to(socket.id).emit("sync_time", {minutes, seconds})
 
         socket.on('new_player', new_player);
-
         function new_player(data) {
+            let originalName = data.name;
+            let name = originalName;
+            let suffix = 1;
+        
+            // Check for duplicate names
+            const nameExists = (n) => {
+                return Object.values(players).some(player => player && player.name === n);
+            };
+        
+            while (nameExists(name)) {
+                name = `${originalName}_${suffix}`;
+                suffix++;
+            }
+
+            io.to(socket.id).emit("change_name", name)
+        
+            // Update the data with the unique name
+            data.name = name;
             players[data.id] = data;
+        
             socket.broadcast.emit('NEW_PLAYER', data);
             socket.broadcast.emit("UPDATE_POS", players);
-            io.emit("NEW_CHAT_MESSAGE", {message: ServerWelcomeMessage + " " + data.name, x:0,y:0 , user:"SERVER"});
+            io.emit("NEW_CHAT_MESSAGE", {
+                message: `${ServerWelcomeMessage} ${data.name}`,
+                x: 0,
+                y: 0,
+                user: "SERVER"
+            });
         }
+        
 
         socket.on("update_pos", update_pos);
 
