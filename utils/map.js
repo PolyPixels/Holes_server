@@ -1,11 +1,15 @@
 const { createNoise2D } = require('simplex-noise');
-const noise2D = createNoise2D();
+const alea = require('alea');
+var noise2D = createNoise2D(alea());
+
 
 const TILESIZE = 32;
 const CHUNKSIZE = 50;
 
 class Map{
-    constructor(){
+    constructor(seed){
+        noise2D = createNoise2D(alea(seed));
+        this.seed = seed;
         this.chunks = {}; //referance with a string "x,y"     {ex. chunks["0,0"]}
         this.getChunk(0,0);
     }
@@ -94,4 +98,4 @@ class Placeable{
     }
 }
 
-module.exports = {Map, Chunk, Placeable, TILESIZE, CHUNKSIZE };
+module.exports = {Map, Chunk, Placeable, TILESIZE, CHUNKSIZE};

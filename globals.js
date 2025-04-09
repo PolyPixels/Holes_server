@@ -2,7 +2,7 @@ const {Map} = require("./utils/map")
 
 let players = {};
 let traps = {};
-let serverMap = new Map()
+let serverMap = new Map(Math.random())
 let chatMessages = [
     {
       message: "Hello, welcome to the chat!",

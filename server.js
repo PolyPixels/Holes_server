@@ -369,6 +369,10 @@ setInterval(() => {
 
         io.emit("server_ended")
         resetCalled = true
+        
+        countdown = 15*60;
+        serverMap = new Map(Math.random());
+
         exec('pm2 restart holes-server', (err, stdout, stderr) => {
             if (err) {
                 console.error(`Restart error: ${err.message}`);
