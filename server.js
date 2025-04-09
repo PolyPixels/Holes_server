@@ -169,6 +169,7 @@ function newConnection(socket) {
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
 
+                    console.log(data);
                     if(data.cost != undefined){
                         if(data.cost.length > 0){
                             let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
@@ -179,8 +180,16 @@ function newConnection(socket) {
                 
                                 }
                                 else{
-                                    itemBag.invBlock.items[data.cost[i][0]] = {};
-                                    itemBag.invBlock.items[data.cost[i][0]].amount = Math.round(data.cost[i][1]*((Math.random()*0.4) + 0.5));
+                                    if(data.cost[i][1] >= 1){
+                                        itemBag.invBlock.items[data.cost[i][0]] = {};
+                                        itemBag.invBlock.items[data.cost[i][0]].amount = Math.round(data.cost[i][1]*((Math.random()*0.4) + 0.5));
+                                    }
+                                    else{
+                                        if(Math.random() < data.cost[i][1]){
+                                            itemBag.invBlock.items[data.cost[i][0]] = {};
+                                            itemBag.invBlock.items[data.cost[i][0]].amount = 1;
+                                        }
+                                    }
                                 }
                             }
                             chunk.objects.push(itemBag);
@@ -368,7 +377,7 @@ setInterval(() => {
         if(!resetCalled){
 
         io.emit("server_ended")
-        resetCalled = true
+        resetCalled = false
         
         countdown = 15*60;
         serverMap = new Map(Math.random());
