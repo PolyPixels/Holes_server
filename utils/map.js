@@ -55,33 +55,63 @@ class Chunk{
             }
         }
 
-        //add trees
-        if(Math.random() < 0.2){
-            let treeX = Math.floor(Math.random()*CHUNKSIZE);
-            let treeY = Math.floor(Math.random()*CHUNKSIZE);
-            if(Math.random() < 0.5){
-                let temp = new Placeable("AppleTree", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
-                temp.stage = 0;
-                this.objects.push(temp);
+        let rand = Math.random();
+        if(rand < 0.2){ //add mushrooms
+            let sructX = Math.floor(Math.random()*CHUNKSIZE);
+            let structY = Math.floor(Math.random()*CHUNKSIZE);
+            let possibleites = [-3,-2,-1,1,2,3];
+            let randX1 = possibleites[Math.floor(Math.random()*possibleites.length)];
+            let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
+            let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
+            let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
+            let m1 = new Placeable("Mushroom", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m2 = new Placeable("Mushroom", (sructX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m3 = new Placeable("Mushroom", (sructX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            m1.stage = 2;
+            m2.stage = 2;
+            m3.stage = 2;
+            this.objects.push(m1);
+            this.objects.push(m2);
+            this.objects.push(m3);
+            for(let x = sructX-5; x < sructX+5; x++){
+                for(let y = structY-5; y < structY+5; y++){
+                    if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
+                        this.data[x + (y / CHUNKSIZE)] = 0;
+                    }
+                }
             }
-            else{
-                let possibleites = [-3,-2,-1,1,2,3];
-                let randX1 = possibleites[Math.floor(Math.random()*possibleites.length)];
-                let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
-                let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-                let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-                let m1 = new Placeable("Mushroom", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
-                let m2 = new Placeable("Mushroom", (treeX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
-                let m3 = new Placeable("Mushroom", (treeX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
-                m1.stage = 2;
-                m2.stage = 2;
-                m3.stage = 2;
-                this.objects.push(m1);
-                this.objects.push(m2);
-                this.objects.push(m3);
+        }
+        else if(rand < 0.4){ //forest chunk
+            for(let x = 3; x < CHUNKSIZE-3; x++){
+                for(let y = 3; y < CHUNKSIZE-3; y++){
+                    this.data[x + (y / CHUNKSIZE)] = 0;
+
+                    if(x > 4 && x < CHUNKSIZE-4 && y > 4 && y < CHUNKSIZE-4){
+                        if(Math.random() < 0.05){
+                            let temp;
+                            if(Math.random() < 0.3){
+                                temp = new Placeable("AppleTree", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+                            }
+                            else{
+                                temp = new Placeable("Tree", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+                            }
+                            temp.stage = 0;
+                            this.objects.push(temp);
+                        }
+                    }
+                }
             }
-            for(let x = treeX-5; x < treeX+5; x++){
-                for(let y = treeY-5; y < treeY+5; y++){
+        }
+        else if(rand < 0.5){ //chest structure
+            let sructX = Math.floor(Math.random()*CHUNKSIZE);
+            let structY = Math.floor(Math.random()*CHUNKSIZE);
+            let temp = new Placeable("Chest", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            //add items to the chest
+            temp.invBlock = {items: {}};
+            temp.invBlock.items["Gem"] = {amount: Math.floor(Math.random()*10)+1};
+            this.objects.push(temp);
+            for(let x = sructX-5; x < sructX+5; x++){
+                for(let y = structY-5; y < structY+5; y++){
                     if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
                         this.data[x + (y / CHUNKSIZE)] = 0;
                     }
@@ -92,7 +122,7 @@ class Chunk{
 }
 
 class Placeable{
-    constructor(objName,x,y,rot,w,h,z,color,ownerName,id){
+    constructor(objName,x,y,rot,w,h,z,color,ownerName,id,hp){
         this.objName = objName;
         this.pos = {x: x, y: y};
         this.rot = rot;
@@ -103,6 +133,7 @@ class Placeable{
         this.color = color;
         this.ownerName = ownerName;
         this.id = id;
+        this.hp = hp;
     }
 }
 
