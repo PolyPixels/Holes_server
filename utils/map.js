@@ -60,7 +60,9 @@ class Chunk{
             let treeX = Math.floor(Math.random()*CHUNKSIZE);
             let treeY = Math.floor(Math.random()*CHUNKSIZE);
             if(Math.random() < 0.5){
-                this.objects.push(new Placeable("AppleTree", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+                let temp = new Placeable("AppleTree", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
+                temp.stage = 0;
+                this.objects.push(temp);
             }
             else{
                 let possibleites = [-3,-2,-1,1,2,3];
@@ -68,9 +70,15 @@ class Chunk{
                 let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
                 let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
                 let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-                this.objects.push(new Placeable("Mushroom", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
-                this.objects.push(new Placeable("Mushroom", (treeX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
-                this.objects.push(new Placeable("Mushroom", (treeX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0));
+                let m1 = new Placeable("Mushroom", (treeX+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
+                let m2 = new Placeable("Mushroom", (treeX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
+                let m3 = new Placeable("Mushroom", (treeX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (treeY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0);
+                m1.stage = 2;
+                m2.stage = 2;
+                m3.stage = 2;
+                this.objects.push(m1);
+                this.objects.push(m2);
+                this.objects.push(m3);
             }
             for(let x = treeX-5; x < treeX+5; x++){
                 for(let y = treeY-5; y < treeY+5; y++){

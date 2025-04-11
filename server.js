@@ -169,7 +169,7 @@ function newConnection(socket) {
                     socket.broadcast.emit("DELETE_OBJ", data);
                     chunk.objects.splice(i, 1);
 
-                    console.log(data);
+                    //console.log(data);
                     if(data.cost != undefined){
                         if(data.cost.length > 0){
                             let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
@@ -212,6 +212,18 @@ function newConnection(socket) {
                 if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
                     chunk.objects[i][data.update_name] = data.update_value;
                     socket.broadcast.emit("UPDATE_OBJ", data);
+                }
+            }
+        }
+
+        socket.on("update_inv", update_inv);
+
+        function update_inv(data){
+            let chunk = serverMap.getChunk(data.cx, data.cy);
+            for(let i = chunk.objects.length-1; i >= 0; i--){
+                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
+                    chunk.objects[i].invBlock.items = data.items;
+                    socket.broadcast.emit("UPDATE_INV", data);
                 }
             }
         }
