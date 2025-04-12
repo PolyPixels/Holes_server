@@ -32,6 +32,7 @@ class Chunk{
         this.cy = y;
         this.objects = [];
         this.projectiles = [];
+        this.sounds = [];
     }
 
     generate(){
