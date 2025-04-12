@@ -259,7 +259,7 @@ function newConnection(socket) {
         function new_sound(data){
             //add sounds to server map
             let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
-            chunk.sounds.push(data);
+            chunk.soundObjs.push(data);
             socket.broadcast.emit("NEW_SOUND", data);
         }
 
@@ -267,14 +267,14 @@ function newConnection(socket) {
 
         function delete_sound(data){
             let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
-            for(let i = chunk.sounds.length-1; i >= 0; i--){
+            for(let i = chunk.soundObjs.length-1; i >= 0; i--){
                 if(
-                    data.id == chunk.sounds[i].id &&
-                    data.lifeSpan == chunk.sounds[i].lifeSpan &&
-                    data.pos.x == chunk.sounds[i].pos.x &&
-                    data.pos.y == chunk.sounds[i].pos.y
+                    data.id == chunk.soundObjs[i].id &&
+                    data.lifeSpan == chunk.soundObjs[i].lifeSpan &&
+                    data.pos.x == chunk.soundObjs[i].pos.x &&
+                    data.pos.y == chunk.soundObjs[i].pos.y
                 ){
-                    chunk.sounds.splice(i, 1);
+                    chunk.soundObjs.splice(i, 1);
                 }
             }
         }
