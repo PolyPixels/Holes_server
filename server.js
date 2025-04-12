@@ -254,6 +254,31 @@ function newConnection(socket) {
             }
         }
 
+        socket.on("new_sound", new_sound);
+
+        function new_sound(data){
+            //add sounds to server map
+            let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
+            chunk.sounds.push(data);
+            socket.broadcast.emit("NEW_SOUND", data);
+        }
+
+        socket.on("delete_sound", delete_sound);
+
+        function delete_sound(data){
+            let chunk = serverMap.getChunk(data.cPos.x, data.cPos.y);
+            for(let i = chunk.sounds.length-1; i >= 0; i--){
+                if(
+                    data.id == chunk.sounds[i].id &&
+                    data.lifeSpan == chunk.sounds[i].lifeSpan &&
+                    data.pos.x == chunk.sounds[i].pos.x &&
+                    data.pos.y == chunk.sounds[i].pos.y
+                ){
+                    chunk.sounds.splice(i, 1);
+                }
+            }
+        }
+
         socket.on("get_chunk", get_chunk);
 
         function get_chunk(data){
