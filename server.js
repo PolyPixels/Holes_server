@@ -347,7 +347,7 @@ function newConnection(socket) {
             if (players[id]) {
                 players[id].isDead = true; // or players[id].status = "dead", etc.
             }
-        
+            let sent = false
             // Notify all players within range of the death
             for (let pid in players) {
                 if (players.hasOwnProperty(pid)) {
@@ -362,7 +362,10 @@ function newConnection(socket) {
                         console.log(distance)
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
                             console.log(name + " Has been killed by " + attacker , x,y )
-                            socket.broadcast("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
+                            if(!sent){
+                                sent = true
+                                io.emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
+                            }                            
                         }else{
                             console.log("s2")
                         }
