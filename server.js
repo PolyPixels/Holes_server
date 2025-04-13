@@ -362,7 +362,7 @@ function newConnection(socket) {
                         console.log(distance)
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
                             console.log(name + " Has been killed by " + attacker , x,y )
-                            io.emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
+                            io.broadcast("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
                         }else{
                             console.log("s2")
                         }
@@ -392,7 +392,6 @@ setInterval(() => {
 
     // Broadcast every minute
     if (seconds === 0 || countdown <= 15) {
-        console.log("TIME change", minutes, seconds)
         io.emit("sync_time", {
             minutes,
             seconds
