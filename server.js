@@ -14,6 +14,10 @@ const allRoutes = require('./api/routes/Routes');
 const port = 3000;
 const app = express();
 
+            // ✅ Basic bad word filter (case-insensitive)
+            const badWords = ['shit', 'fuck', 'bitch', 'cunt', 'nigg', 'asshole', 'cock', 'dick','fag'];
+            const badWordRegex = new RegExp(badWords.join('|'), 'i');
+            
 app.use(cors({
     origin: true,  // This automatically reflects the request's origin
     methods: ['GET', 'POST'],
@@ -64,10 +68,6 @@ function newConnection(socket) {
             let name = originalName;
             let suffix = 1;
         
-            // ✅ Basic bad word filter (case-insensitive)
-            const badWords = ['shit', 'fuck', 'bitch', 'cunt', 'nigg', 'asshole', 'cock', 'dick','fag'];
-            const badWordRegex = new RegExp(badWords.join('|'), 'i');
-            
         
             // Replace bad words with asterisks or generic fallback
             if (badWordRegex.test(name)) {
@@ -331,6 +331,12 @@ function newConnection(socket) {
                         // If the player is within their hearing range, send the chat message.
                         if (distance <= 5000+(player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange)) {
                             //console.log("???????",chatMsg)
+                            console.log(chatMsg)
+                            //check chat message to bad words 
+                            if (badWordRegex.test(chatMsg.message)) {
+                                chatMsg.message = "I curse at you !!!"
+                            }
+
                             io.to(id).emit("NEW_CHAT_MESSAGE", chatMsg);
                         }
                     }
@@ -347,7 +353,6 @@ function newConnection(socket) {
             if (players[id]) {
                 players[id].isDead = true; // or players[id].status = "dead", etc.
             }
-            let sent = false
             // Notify all players within range of the death
             for (let pid in players) {
                 if (players.hasOwnProperty(pid)) {
@@ -362,10 +367,10 @@ function newConnection(socket) {
                         console.log(distance)
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
                             console.log(name + " Has been killed by " + attacker , x,y )
-                            if(!sent){
-                                sent = true
-                                io.emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
-                            }                            
+            
+                                
+                                io.to(pid).emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
+                                                      
                         }else{
                             console.log("s2")
                         }
