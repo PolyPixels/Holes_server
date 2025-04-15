@@ -172,8 +172,7 @@ function newConnection(socket) {
 
         function disconnect(data){
             console.log(socket.id + " disconnected");
-            validColors.push(data.color)
-            players[socket.id] = []
+            players[socket.id] = [];
             delete players[socket.id];
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
