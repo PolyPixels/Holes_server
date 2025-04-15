@@ -149,8 +149,23 @@ function newConnection(socket) {
             chunkPos[0] = parseInt(chunkPos[0]);
             chunkPos[1] = parseInt(chunkPos[1]);
             let chunk = serverMap.getChunk(chunkPos[0], chunkPos[1]);
-            chunk.data[data.index] = data.val;
-            socket.broadcast.emit("UPDATE_NODE", data);
+
+            if(data.amt > 0){
+                if (chunk.data[data.index] > 0) chunk.data[data.index] -= data.amt;
+                if (chunk.data[data.index] < 0.3 && chunk.data[data.index] !== -1){
+                    chunk.data[data.index] = 0;
+                }
+            }
+            else{
+                if (chunk.data[data.index] < 1.3 && chunk.data[data.index] !== -1){
+                    chunk.data[data.index] -= data.amt;
+                }
+                if (chunk.data[data.index] > 1.3){
+                    chunk.data[data.index] = 1.3;
+                }
+            }
+
+            io.emit("UPDATE_NODE", data);
         }
 
         socket.on("disconnect", disconnect);
