@@ -90,6 +90,7 @@ function newConnection(socket) {
             }
         
             data.name = name;
+            data.kills=0;
             players[data.id] = data;
         
             socket.broadcast.emit('NEW_PLAYER', data);
@@ -385,6 +386,7 @@ function newConnection(socket) {
                     let player = players[pid];
                     if(player.name == attacker){
                         player.kills +=1;
+                        console.log(player.name, player.kills)
                     }
                     if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
                         let dx = player.pos.x - x;
@@ -394,8 +396,9 @@ function newConnection(socket) {
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
                             console.log(name + " Has been killed by " + attacker , x,y )
             
+                            console.log(player.name, player.kills)
                                 
-                                io.to(pid).emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
+                            io.to(pid).emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
                                                       
                         }else{
                             console.log("s2")
