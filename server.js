@@ -6,7 +6,7 @@ const { Map, Chunk, Placeable, TILESIZE, CHUNKSIZE } = require('./utils/map');
 const { getGlobals } = require("./globals"); // Ensure correct import
 const { exec } = require('child_process');
 const globals = getGlobals(); // Now it correctly retrieves global variables
-let { players, traps,serverMap,chatMessages} = globals;
+let { players,serverMap,chatMessages} = globals;
 
 let countdown = 15 * 60; // 15 minutes in seconds
 
@@ -52,11 +52,11 @@ function newConnection(socket) {
         const minutes = Math.floor(countdown / 60);
         const seconds = countdown % 60;
         console.log('New connection: ' + socket.id);
-        io.to(socket.id).emit("OLD_DATA", {players:players,traps:traps });
-        let newColor = validColors.pop();
-        io.to(socket.id).emit("YOUR_ID", {id:socket.id, color:newColor});
 
-        io.to(socket.id).emit("sync_time", {minutes, seconds})
+        io.to(socket.id).emit("OLD_DATA", {players:players}); //maybe add old chat messages here?
+        io.to(socket.id).emit("YOUR_ID", {id:socket.id});
+
+        io.to(socket.id).emit("sync_time", {minutes, seconds});
 
         socket.on('new_player', new_player);
         function new_player(data) {
@@ -93,7 +93,7 @@ function newConnection(socket) {
             players[data.id] = data;
         
             socket.broadcast.emit('NEW_PLAYER', data);
-            socket.broadcast.emit("UPDATE_POS", players);
+            
             io.emit("NEW_CHAT_MESSAGE", {
                 message: `${ServerWelcomeMessage} ${data.name}`,
                 x: 0,
@@ -107,28 +107,40 @@ function newConnection(socket) {
         socket.on("update_pos", update_pos);
 
         function update_pos(data) {
-        if (!players[data.id]) {
-            console.error(`Player with id ${data.id} not found.`);
-            return;
+            if (!players[data.id]) {
+                console.error(`Player with id ${data.id} not found.`);
+                return;
+            }
+
+            players[data.id].pos = data.pos;
+            players[data.id].holding = data.holding;
+        
+            // Broadcast the updated position to other clients
+            socket.broadcast.emit("UPDATE_POS", data);
         }
-      
-        // Only update mutable properties (dynamic data like position, health, etc.)
-        players[data.id].pos = data.pos;
-        players[data.id].statBlock.stats.hp = data.statBlock.stats.hp;
-        players[data.id].holding = data.holding;
-        players[data.id].animationType = data.animationType;
-        players[data.id].animationFrame = data.animationFrame;
-    
-        // Broadcast the updated position to other clients
-        socket.broadcast.emit("UPDATE_POS", {
-            id: data.id,
-            pos: data.pos,
-            hp: data.statBlock.stats.hp,
-            holding: data.holding,
-            animationType: data.animationType,
-            animationFrame: data.animationFrame
-        });
-      }
+
+        socket.on("update_player", update_player);
+
+        function update_player(data) {
+            if (!players[data.id]) {
+                console.error(`Player with id ${data.id} not found.`);
+                return;
+            }
+
+            for(let i=0; i<data.update_names.length; i++){
+                if(data.update_names[i].includes("stats")){
+                    players[data.id].statBlock.stats[data.update_names[i].split("stats.")[1]] = data.update_values[i];
+                }
+                else{
+                    players[data.id][data.update_names[i]] = data.update_values[i];
+                }
+            }
+            players[data.id].pos = data.pos;
+            players[data.id].holding = data.holding;
+        
+            // Broadcast the updated value to other clients
+            socket.broadcast.emit("UPDATE_PLAYER", data);
+        }
       
         socket.on("update_node", update_map);
 
