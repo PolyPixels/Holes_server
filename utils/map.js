@@ -36,6 +36,20 @@ class Chunk{
     }
 
     generate(){
+        if(Math.abs(this.cx) > 5 || Math.abs(this.cy) > 5){
+            for (let x = 0; x < CHUNKSIZE; x++) {
+                for (let y = 0; y < CHUNKSIZE; y++) {
+                    const index = x + (y / CHUNKSIZE);
+                    this.data[index] = 0;
+
+                    if(x%2==0 && y%2==0){
+                        let temp = new Placeable("BearTrap", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 68, 48, 1, 0, "", "", 1000);
+                        this.objects.push(temp);
+                    }
+                }
+            }
+            return;
+        }
         for (let x = 0; x < CHUNKSIZE; x++) {
             for (let y = 0; y < CHUNKSIZE; y++) {
                 // if (x === 0 || y === 0 || x === CHUNKSIZE - 1 || y === CHUNKSIZE - 1) {
