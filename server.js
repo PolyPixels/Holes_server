@@ -199,7 +199,7 @@ function newConnection(socket) {
                     //console.log(data);
                     if(data.cost != undefined){
                         if(data.cost.length > 0){
-                            let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
+                            let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 0, "", "");
                             itemBag.type = "InvObj";
                             itemBag.invBlock = {items: {}};
                             for(let i = 0; i < data.cost.length; i++){
