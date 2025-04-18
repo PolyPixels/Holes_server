@@ -58,7 +58,7 @@ class Chunk{
 
         let rand = Math.random();
         if(rand < 0.2){ //add mushrooms
-            let sructX = Math.floor(Math.random()*CHUNKSIZE);
+            let structX = Math.floor(Math.random()*CHUNKSIZE);
             let structY = Math.floor(Math.random()*CHUNKSIZE);
             if(structX > CHUNKSIZE-4) structX = CHUNKSIZE-4;
             if(structX < 4) structX = 4;
@@ -69,16 +69,16 @@ class Chunk{
             let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-            let m1 = new Placeable("Mushroom", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m2 = new Placeable("Mushroom", (sructX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m3 = new Placeable("Mushroom", (sructX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m1 = new Placeable("Mushroom", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m2 = new Placeable("Mushroom", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m3 = new Placeable("Mushroom", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
             m1.stage = 2;
             m2.stage = 2;
             m3.stage = 2;
             this.objects.push(m1);
             this.objects.push(m2);
             this.objects.push(m3);
-            for(let x = sructX-5; x < sructX+5; x++){
+            for(let x = structX-5; x < structX+5; x++){
                 for(let y = structY-5; y < structY+5; y++){
                     if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
                         this.data[x + (y / CHUNKSIZE)] = 0;
@@ -87,7 +87,7 @@ class Chunk{
             }
         }
         if(rand < 0.3){ //add turrets
-            let sructX = Math.floor(Math.random()*CHUNKSIZE);
+            let structX = Math.floor(Math.random()*CHUNKSIZE);
             let structY = Math.floor(Math.random()*CHUNKSIZE);
             if(structX > CHUNKSIZE-6) structX = CHUNKSIZE-6;
             if(structX < 6) structX = 6;
@@ -98,16 +98,16 @@ class Chunk{
             let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-            let m1 = new Placeable("Turret", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m2 = new Placeable("Turret", (sructX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m3 = new Placeable("Turret", (sructX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
             m1.stage = 2;
             m2.stage = 2;
             m3.stage = 2;
             this.objects.push(m1);
             this.objects.push(m2);
             this.objects.push(m3);
-            for(let x = sructX-5; x < sructX+5; x++){
+            for(let x = structX-5; x < structX+5; x++){
                 for(let y = structY-5; y < structY+5; y++){
                     if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
                         this.data[x + (y / CHUNKSIZE)] = 0;
