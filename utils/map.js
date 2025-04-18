@@ -113,9 +113,9 @@ class Chunk{
             let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-            let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-            let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
+            let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
+            let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
+            let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
             m1.stage = 2;
             m2.stage = 2;
             m3.stage = 2;
@@ -213,11 +213,11 @@ class Chunk{
         //             const isDoorHere = doorSpots.some(d => d.x === gx && d.y === gy);
         
         //             if (isEdge && !isDoorHere) {
-        //                 const wall = new Placeable("Wall", px, py, 0, TILE_WALL, TILE_WALL, 2, 11, "", "", 100);
+        //                 const wall = new Placeable("Wall", px, py, 0, TILE_WALL, TILE_WALL, 2, 0, "", "", 100);
         //                 this.objects.push(wall);
         //             } else {
         //                 this.data[gx + (gy / CHUNKSIZE)] = 0;
-        //                 const floor = new Placeable("Floor", px, py, 0, TILE_WALL, TILE_WALL, 0, 11, "", "", 100);
+        //                 const floor = new Placeable("Floor", px, py, 0, TILE_WALL, TILE_WALL, 0, 0, "", "", 100);
         //                 this.objects.push(floor);
         //             }
         //         }
@@ -227,14 +227,14 @@ class Chunk{
         //     for (const d of doorSpots) {
         //         const centerX = (d.x + this.cx * CHUNKSIZE) * TILE_WALL;
         //         const centerY = (d.y + this.cy * CHUNKSIZE) * TILE_WALL;
-        //         const door = new Placeable("Door", centerX + (TILE_WALL - TILE_DOOR_W) / 2, centerY, 0, TILE_DOOR_W, TILE_DOOR_H, 2, 11, "", "", 100);
+        //         const door = new Placeable("Door", centerX + (TILE_WALL - TILE_DOOR_W) / 2, centerY, 0, TILE_DOOR_W, TILE_DOOR_H, 2, 0, "", "", 100);
         //         this.objects.push(door);
         //     }
         
         //     // Add chest in center
         //     const chestX = roomX + Math.floor(roomSize / 2);
         //     const chestY = roomY + Math.floor(roomSize / 2);
-        //     const chest = new Placeable("Chest", (chestX + this.cx * CHUNKSIZE) * TILE_WALL, (chestY + this.cy * CHUNKSIZE) * TILE_WALL, 0, 120, 120, 0, 11, "", "", 100);
+        //     const chest = new Placeable("Chest", (chestX + this.cx * CHUNKSIZE) * TILE_WALL, (chestY + this.cy * CHUNKSIZE) * TILE_WALL, 0, 120, 120, 0, 0, "", "", 100);
         //     chest.invBlock = { items: { Gem: { amount: Math.floor(Math.random() * 5) + 1 } } };
         //     this.objects.push(chest);
         // }
