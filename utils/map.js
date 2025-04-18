@@ -154,7 +154,7 @@ class Chunk{
                 }
             }
         }
-        else if(rand < 1){ //chest structure
+        else if(rand < 0.6){ //chest structure
             let sructX = Math.floor(Math.random()*CHUNKSIZE);
             let structY = Math.floor(Math.random()*CHUNKSIZE);
             let temp = new Placeable("Chest", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
@@ -165,7 +165,7 @@ class Chunk{
             if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*3)+1};
             if(Math.random() < 0.2) temp.invBlock.items["Fire Staff"] = {amount: 1};
             if(Math.random() < 0.2) temp.invBlock.items["Laser Gun"] = {amount: 1};
-            if(Math.random() < 0.05) temp.invBlock.items["Philosopher Stone"] = {amount: 1};
+            if(Math.random() < 0.05) temp.invBlock.items["Philosopher's Stone"] = {amount: 1};
             this.objects.push(temp);
             for(let x = sructX-5; x < sructX+5; x++){
                 for(let y = structY-5; y < structY+5; y++){
