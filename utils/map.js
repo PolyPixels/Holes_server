@@ -36,6 +36,21 @@ class Chunk{
     }
 
     generate(){
+        if(Math.abs(this.cx) > 5 || Math.abs(this.cy) > 5){
+            for (let x = 0; x < CHUNKSIZE; x++) {
+                for (let y = 0; y < CHUNKSIZE; y++) {
+                    const index = x + (y / CHUNKSIZE);
+                    this.data[index] = 0;
+
+                    if(x%2==0 && y%2==0){
+                        let temp = new Placeable("BearTrap", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 68, 48, 1, 0, "", "", 1000);
+                        this.objects.push(temp);
+                    }
+                }
+            }
+            return;
+        }
+
         for (let x = 0; x < CHUNKSIZE; x++) {
             for (let y = 0; y < CHUNKSIZE; y++) {
                 // if (x === 0 || y === 0 || x === CHUNKSIZE - 1 || y === CHUNKSIZE - 1) {
@@ -139,13 +154,18 @@ class Chunk{
                 }
             }
         }
-        else if(rand < 0.5){ //chest structure
+        else if(rand < 1){ //chest structure
             let sructX = Math.floor(Math.random()*CHUNKSIZE);
             let structY = Math.floor(Math.random()*CHUNKSIZE);
             let temp = new Placeable("Chest", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
             //add items to the chest
             temp.invBlock = {items: {}};
             temp.invBlock.items["Gem"] = {amount: Math.floor(Math.random()*10)+1};
+            if(Math.random() < 0.7) temp.invBlock.items["Bomb"] = {amount: Math.floor(Math.random()*5)+1};
+            if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*3)+1};
+            if(Math.random() < 0.2) temp.invBlock.items["Fire Staff"] = {amount: 1};
+            if(Math.random() < 0.2) temp.invBlock.items["Laser Gun"] = {amount: 1};
+            if(Math.random() < 0.05) temp.invBlock.items["Philosopher Stone"] = {amount: 1};
             this.objects.push(temp);
             for(let x = sructX-5; x < sructX+5; x++){
                 for(let y = structY-5; y < structY+5; y++){
@@ -155,69 +175,69 @@ class Chunk{
                 }
             }
         }
-        if (rand < 0.55) {
-            const TILE_WALL = 128;
-            const TILE_DOOR_W = 64;
-            const TILE_DOOR_H = 128;
+        // if (rand < 0.55) {
+        //     const TILE_WALL = 128;
+        //     const TILE_DOOR_W = 64;
+        //     const TILE_DOOR_H = 128;
         
-            const roomSize = 9; // in tiles
-            const wallOffset = 1;
+        //     const roomSize = 9; // in tiles
+        //     const wallOffset = 1;
         
-            const roomX = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
-            const roomY = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
+        //     const roomX = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
+        //     const roomY = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
         
-            const globalRoomX = roomX + this.cx * CHUNKSIZE;
-            const globalRoomY = roomY + this.cy * CHUNKSIZE;
+        //     const globalRoomX = roomX + this.cx * CHUNKSIZE;
+        //     const globalRoomY = roomY + this.cy * CHUNKSIZE;
         
-            // Calculate actual pixel positions
-            function toPixel(x, y) {
-                return [x * TILE_WALL, y * TILE_WALL];
-            }
+        //     // Calculate actual pixel positions
+        //     function toPixel(x, y) {
+        //         return [x * TILE_WALL, y * TILE_WALL];
+        //     }
         
-            // Prepare door world coordinates (tile-based, NOT pixel yet)
-            const doorSpots = [
-                { x: roomX + Math.floor(roomSize / 2), y: roomY },                         // top
-                { x: roomX + Math.floor(roomSize / 2), y: roomY + roomSize - 1 },         // bottom
-                { x: roomX,                         y: roomY + Math.floor(roomSize / 2) }, // left
-                { x: roomX + roomSize - 1,         y: roomY + Math.floor(roomSize / 2) }, // right
-            ];
+        //     // Prepare door world coordinates (tile-based, NOT pixel yet)
+        //     const doorSpots = [
+        //         { x: roomX + Math.floor(roomSize / 2), y: roomY },                         // top
+        //         { x: roomX + Math.floor(roomSize / 2), y: roomY + roomSize - 1 },         // bottom
+        //         { x: roomX,                         y: roomY + Math.floor(roomSize / 2) }, // left
+        //         { x: roomX + roomSize - 1,         y: roomY + Math.floor(roomSize / 2) }, // right
+        //     ];
         
-            // Build the room
-            for (let x = 0; x < roomSize; x++) {
-                for (let y = 0; y < roomSize; y++) {
-                    const gx = roomX + x;
-                    const gy = roomY + y;
-                    const [px, py] = toPixel(gx + this.cx * CHUNKSIZE, gy + this.cy * CHUNKSIZE);
+        //     // Build the room
+        //     for (let x = 0; x < roomSize; x++) {
+        //         for (let y = 0; y < roomSize; y++) {
+        //             const gx = roomX + x;
+        //             const gy = roomY + y;
+        //             const [px, py] = toPixel(gx + this.cx * CHUNKSIZE, gy + this.cy * CHUNKSIZE);
         
-                    const isEdge = x === 0 || y === 0 || x === roomSize - 1 || y === roomSize - 1;
-                    const isDoorHere = doorSpots.some(d => d.x === gx && d.y === gy);
+        //             const isEdge = x === 0 || y === 0 || x === roomSize - 1 || y === roomSize - 1;
+        //             const isDoorHere = doorSpots.some(d => d.x === gx && d.y === gy);
         
-                    if (isEdge && !isDoorHere) {
-                        const wall = new Placeable("Wall", px, py, 0, TILE_WALL, TILE_WALL, 2, 11, "", "", 100);
-                        this.objects.push(wall);
-                    } else {
-                        this.data[gx + (gy / CHUNKSIZE)] = 0;
-                        const floor = new Placeable("Floor", px, py, 0, TILE_WALL, TILE_WALL, 0, 11, "", "", 100);
-                        this.objects.push(floor);
-                    }
-                }
-            }
+        //             if (isEdge && !isDoorHere) {
+        //                 const wall = new Placeable("Wall", px, py, 0, TILE_WALL, TILE_WALL, 2, 11, "", "", 100);
+        //                 this.objects.push(wall);
+        //             } else {
+        //                 this.data[gx + (gy / CHUNKSIZE)] = 0;
+        //                 const floor = new Placeable("Floor", px, py, 0, TILE_WALL, TILE_WALL, 0, 11, "", "", 100);
+        //                 this.objects.push(floor);
+        //             }
+        //         }
+        //     }
         
-            // Place doors on each side, centered in wall tiles
-            for (const d of doorSpots) {
-                const centerX = (d.x + this.cx * CHUNKSIZE) * TILE_WALL;
-                const centerY = (d.y + this.cy * CHUNKSIZE) * TILE_WALL;
-                const door = new Placeable("Door", centerX + (TILE_WALL - TILE_DOOR_W) / 2, centerY, 0, TILE_DOOR_W, TILE_DOOR_H, 2, 11, "", "", 100);
-                this.objects.push(door);
-            }
+        //     // Place doors on each side, centered in wall tiles
+        //     for (const d of doorSpots) {
+        //         const centerX = (d.x + this.cx * CHUNKSIZE) * TILE_WALL;
+        //         const centerY = (d.y + this.cy * CHUNKSIZE) * TILE_WALL;
+        //         const door = new Placeable("Door", centerX + (TILE_WALL - TILE_DOOR_W) / 2, centerY, 0, TILE_DOOR_W, TILE_DOOR_H, 2, 11, "", "", 100);
+        //         this.objects.push(door);
+        //     }
         
-            // Add chest in center
-            const chestX = roomX + Math.floor(roomSize / 2);
-            const chestY = roomY + Math.floor(roomSize / 2);
-            const chest = new Placeable("Chest", (chestX + this.cx * CHUNKSIZE) * TILE_WALL, (chestY + this.cy * CHUNKSIZE) * TILE_WALL, 0, 120, 120, 0, 11, "", "", 100);
-            chest.invBlock = { items: { Gem: { amount: Math.floor(Math.random() * 5) + 1 } } };
-            this.objects.push(chest);
-        }
+        //     // Add chest in center
+        //     const chestX = roomX + Math.floor(roomSize / 2);
+        //     const chestY = roomY + Math.floor(roomSize / 2);
+        //     const chest = new Placeable("Chest", (chestX + this.cx * CHUNKSIZE) * TILE_WALL, (chestY + this.cy * CHUNKSIZE) * TILE_WALL, 0, 120, 120, 0, 11, "", "", 100);
+        //     chest.invBlock = { items: { Gem: { amount: Math.floor(Math.random() * 5) + 1 } } };
+        //     this.objects.push(chest);
+        // }
         
         
         
