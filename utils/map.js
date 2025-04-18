@@ -125,7 +125,6 @@ class Chunk{
                             let temp;
                             if(Math.random() < 0.3){
                                 temp = new Placeable("AppleTree", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-                                temp.stage = 0;
                             }
                             else if(Math.random() < 0.4){
                                 temp = new Placeable("Mushroom", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
@@ -133,7 +132,6 @@ class Chunk{
                             }
                             else{
                                 temp = new Placeable("Tree", (x+(this.cx*CHUNKSIZE)) * TILESIZE, (y+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
-                                temp.stage = 0;
                             }
                             this.objects.push(temp);
                         }
