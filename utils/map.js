@@ -165,8 +165,8 @@ class Chunk{
             const roomSize = 9; // in tiles
             const wallOffset = 1;
         
-            const roomX = Math.floor(Math.random() * (CHUNKSIZE - roomSize - wallOffset * 2));
-            const roomY = Math.floor(Math.random() * (CHUNKSIZE - roomSize - wallOffset * 2));
+            const roomX = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
+            const roomY = Math.floor(0.5 * (CHUNKSIZE - roomSize - wallOffset * 2));
         
             const globalRoomX = roomX + this.cx * CHUNKSIZE;
             const globalRoomY = roomY + this.cy * CHUNKSIZE;
