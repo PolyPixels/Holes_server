@@ -1,3 +1,4 @@
+![image](https://github.com/user-attachments/assets/735a3bfb-79dd-49ad-8934-5f13f893dd11)
 
 
 Here’s an updated `README.md` file that includes the use of `express.static` to serve static files, along with other relevant details about the project:
