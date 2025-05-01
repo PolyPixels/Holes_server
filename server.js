@@ -8,15 +8,17 @@ const { exec } = require('child_process');
 const globals = getGlobals(); // Now it correctly retrieves global variables
 let { players,serverMap,chatMessages} = globals;
 
-let countdown = 15 * 60; // 15 minutes in seconds
-
+const dotenv = require("dotenv");
+dotenv.config();
+let countdown = process.env.SERVER_TIME || 15*60;
+console.log(countdown, "COUNT")
 const allRoutes = require('./api/routes/Routes');
 const port = 3000;
 const app = express();
 
             // ✅ Basic bad word filter (case-insensitive)
-            const badWords = ['shit', 'fuck', 'bitch', 'cunt', 'nigg', 'asshole', 'cock', 'dick','fag'];
-            const badWordRegex = new RegExp(badWords.join('|'), 'i');
+const badWords = ['shit', 'fuck', 'bitch', 'cunt', 'nigg', 'asshole', 'cock', 'dick','fag'];
+const badWordRegex = new RegExp(badWords.join('|'), 'i');
             
 app.use(cors({
     origin: true,  // This automatically reflects the request's origin
@@ -24,7 +26,7 @@ app.use(cors({
     credentials: true
 }));
 
-const ServerWelcomeMessage = process.env.Welcome || "Please Welcome";
+const ServerWelcomeMessage = process.env.Server_Welcome || "Please Welcome";
 const path = require('path');
 
 // Serve static files using an absolute path
@@ -424,16 +426,15 @@ function newConnection(socket) {
 let resetCalled = false
 setInterval(() => {
 
-    const minutes = Math.floor(countdown / 60);
-    const seconds = countdown % 60;
 
     // Broadcast every minute
-    if (seconds === 0 || countdown <= 15) {
+    if (countdown % 60 === 0 || countdown <= 15) {
+        console.log(countdown, "count down")
         io.emit("sync_time", {
-            minutes,
-            seconds
+            totalSeconds: countdown
         });
     }
+    
     // At 1 minute left
     if (countdown === 60) {
         io.emit("NEW_CHAT_MESSAGE", {
