@@ -113,9 +113,9 @@ class Chunk{
             let randY1 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randX2 = possibleites[Math.floor(Math.random()*possibleites.length)];
             let randY2 = possibleites[Math.floor(Math.random()*possibleites.length)];
-            let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
-            let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
-            let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 0, "", "", 100);
+            let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "", "", 100);
+            let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "", "", 100);
+            let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "", "", 100);
             m1.stage = 2;
             m2.stage = 2;
             m3.stage = 2;
