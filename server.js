@@ -93,6 +93,7 @@ function newConnection(socket) {
         
             data.name = name;
             data.kills=0;
+            data.deaths=0;
             players[data.id] = data;
         
             socket.broadcast.emit('NEW_PLAYER', data);
@@ -381,6 +382,7 @@ function newConnection(socket) {
             // Mark the player as dead in the server-side state (optional, depends on your logic)
             if (players[id]) {
                 players[id].isDead = true; // or players[id].status = "dead", etc.
+                players[id].deaths +=1
             }
             // Notify all players within range of the death
             for (let pid in players) {
