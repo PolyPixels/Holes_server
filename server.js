@@ -10,10 +10,10 @@ let { players,serverMap,chatMessages} = globals;
 
 const dotenv = require("dotenv");
 dotenv.config();
-let countdown = process.env.SERVER_TIME || 15*60;
+let countdown = process.env.SERVER_TIME || 60*60*24*10000;
 console.log(countdown, "COUNT")
 const allRoutes = require('./api/routes/Routes');
-const port = 3000;
+const port = process.env.PORT;
 const app = express();
 
             // ✅ Basic bad word filter (case-insensitive)
