@@ -13,7 +13,7 @@ dotenv.config();
 let countdown = process.env.SERVER_TIME || 60*60*24*10000;
 console.log(countdown, "COUNT")
 const allRoutes = require('./api/routes/Routes');
-const port = process.env.PORT;
+const port = process.env.PORT|| 3000;
 const app = express();
 
             // ✅ Basic bad word filter (case-insensitive)
