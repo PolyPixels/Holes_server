@@ -160,6 +160,7 @@ class Chunk{
             let temp = new Placeable("Chest", (sructX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 0, 11, "", "", 100);
             //add items to the chest
             temp.invBlock = {items: {}};
+            temp.invBlock.invId = Math.random()*100000;
             temp.invBlock.items["Gem"] = {amount: Math.floor(Math.random()*10)+1};
             if(Math.random() < 0.7) temp.invBlock.items["Bomb"] = {amount: Math.floor(Math.random()*5)+1};
             if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*3)+1};

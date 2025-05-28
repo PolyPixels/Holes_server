@@ -175,7 +175,7 @@ function newConnection(socket) {
         socket.on("update_nodes", update_nodes);
 
         function update_nodes(data) {
-            console.log("update nodes", data);
+            //console.log("update nodes", data);
             let chunk = serverMap.getChunk(data.cx, data.cy);
             let posX = Math.round(data.pos.x / TILESIZE);
             let posY = Math.round(data.pos.y / TILESIZE);
@@ -295,6 +295,7 @@ function newConnection(socket) {
                             let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
                             itemBag.type = "InvObj";
                             itemBag.invBlock = {items: {}};
+                            itemBag.invBlock.invId = Math.random()*100000;
                             for(let i = 0; i < data.cost.length; i++){
                                 if(data.cost[i][0] == "dirt"){
                 
