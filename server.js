@@ -413,7 +413,13 @@ function newConnection(socket) {
                     tempData[(x + (y / CHUNKSIZE))] = chunk.data[(x + (y / CHUNKSIZE))];
                 }
             }
-            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, objects: chunk.objects, projectiles: chunk.projectiles});
+            let tempData2 = {};
+            for (let x = 0; x < CHUNKSIZE; x++) {
+                for (let y = 0; y < CHUNKSIZE; y++) {
+                    tempData2[(x + (y / CHUNKSIZE))] = chunk.iron_data[(x + (y / CHUNKSIZE))];
+                }
+            }
+            io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, iron_data: tempData2, objects: chunk.objects, projectiles: chunk.projectiles});
         }
 
 
