@@ -135,6 +135,10 @@ function newConnection(socket) {
                 if(data.update_names[i].includes("stats")){
                     players[data.id].statBlock.stats[data.update_names[i].split("stats.")[1]] = data.update_values[i];
                 }
+                else if(data.update_names[i].includes("statBlock")){
+                    console.log("statBlock update", data.update_names[i], data.update_values[i]);
+                    players[data.id].statBlock[data.update_names[i].split("statBlock.")[1]] = data.update_values[i];
+                }
                 else{
                     players[data.id][data.update_names[i]] = data.update_values[i];
                 }
@@ -330,9 +334,19 @@ function newConnection(socket) {
         function update_obj(data){
             let chunk = serverMap.getChunk(data.cx, data.cy);
             for(let i = chunk.objects.length-1; i >= 0; i--){
-                if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
-                    chunk.objects[i][data.update_name] = data.update_value;
-                    socket.broadcast.emit("UPDATE_OBJ", data);
+                if(data.objName == "ExpOrb"){
+                    if(data.z == chunk.objects[i].z && data.id == chunk.objects[i].id){
+                        chunk.objects[i][data.update_name] = data.update_value;
+                        chunk.objects[i].pos.x = data.pos.x;
+                        chunk.objects[i].pos.y = data.pos.y;
+                        socket.broadcast.emit("UPDATE_OBJ", data);
+                    }
+                }
+                else{
+                    if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
+                        chunk.objects[i][data.update_name] = data.update_value;
+                        socket.broadcast.emit("UPDATE_OBJ", data);
+                    }
                 }
             }
         }
