@@ -176,6 +176,32 @@ function newConnection(socket) {
             io.emit("UPDATE_NODE", data);
         }
 
+        socket.on("update_iron_node", update_iron_node);
+
+        function update_iron_node(data) {
+            let chunkPos = data.chunkPos.split(",");
+            chunkPos[0] = parseInt(chunkPos[0]);
+            chunkPos[1] = parseInt(chunkPos[1]);
+            let chunk = serverMap.getChunk(chunkPos[0], chunkPos[1]);
+
+            if(data.amt > 0){
+                if (chunk.iron_data[data.index] > 0) chunk.iron_data[data.index] -= data.amt;
+                if (chunk.iron_data[data.index] < 0.3 && chunk.iron_data[data.index] !== -1){
+                    chunk.iron_data[data.index] = 0;
+                }
+            }
+            else{
+                if (chunk.iron_data[data.index] < 1.3 && chunk.iron_data[data.index] !== -1){
+                    chunk.iron_data[data.index] -= data.amt;
+                }
+                if (chunk.iron_data[data.index] > 1.3){
+                    chunk.iron_data[data.index] = 1.3;
+                }
+            }
+
+            io.emit("UPDATE_IRON_NODE", data);
+        }
+
         socket.on("update_nodes", update_nodes);
 
         function update_nodes(data) {
