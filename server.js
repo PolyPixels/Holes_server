@@ -462,6 +462,25 @@ function newConnection(socket) {
             io.to(socket.id).emit("GIVE_CHUNK", {x: pos[0], y: pos[1], data: tempData, iron_data: tempData2, objects: chunk.objects, projectiles: chunk.projectiles});
         }
 
+        socket.on("get_portals", get_portals);
+
+        function get_portals(data){
+            let portals = [];
+            for (let y = data.cPos.y - 5; y <= data.cPos.y + 5; y++) {
+                for (let x = data.cPos.x - 5; x <= data.cPos.x + 5; x++) {
+                    if(serverMap.chunks["" + x + "," + y] != undefined){
+                        let chunk = serverMap.chunks["" + x + "," + y];
+                        for(let i = 0; i < chunk.objects.length; i++){
+                            if(chunk.objects[i].objName == "Portal"){
+                                portals.push({ cx: x, cy: y, pos: chunk.objects[i].pos, color: chunk.objects[i].color});
+                            }
+                        }
+                    }
+                }
+            }
+            io.to(socket.id).emit("GIVE_PORTALS", {portals: portals});
+        }
+
 
         socket.on("send_message", send_message);
 
