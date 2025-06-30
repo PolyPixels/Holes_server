@@ -292,6 +292,118 @@ function newConnection(socket) {
             io.emit("UPDATE_NODES", data);
         }
 
+        socket.on("update_iron_nodes", update_iron_nodes);
+
+        function update_iron_nodes(data) {
+            //console.log("update nodes", data);
+            let chunk = serverMap.getChunk(data.cx, data.cy);
+            let posX = Math.round(data.pos.x / TILESIZE);
+            let posY = Math.round(data.pos.y / TILESIZE);
+            posX = posX - (data.cx * CHUNKSIZE);
+            posY = posY - (data.cy * CHUNKSIZE);
+
+            let reward = 0;
+            for(let x = posX-data.radius; x <= posX+data.radius; x++){
+                for(let y = posY-data.radius; y <= posY+data.radius; y++){
+                    if(x >= 0 && x < CHUNKSIZE && y >= 0 && y < CHUNKSIZE){
+                        let index = x + (y / CHUNKSIZE);
+                        if(data.amt > 0){
+                            if (chunk.iron_data[index] > 0){
+                                reward += chunk.iron_data[index];
+                                chunk.iron_data[index] -= data.amt;
+                            }
+                            if (chunk.iron_data[index] < 0.3 && chunk.iron_data[index] !== -1){
+                                chunk.iron_data[index] = 0;
+                            }
+                        }
+                        else{
+                            if (chunk.iron_data[index] < 1.3 && chunk.iron_data[index] !== -1){
+                                chunk.iron_data[index] -= data.amt;
+                            }
+                            if (chunk.iron_data[index] > 1.3){
+                                chunk.iron_data[index] = 1.3;
+                            }
+                        }
+                    }
+                    else{
+                        //deal with the edge cases where the node is outside the chunk
+                        let tempChunk;
+                        let index;
+                        if(y < 0 && x >= 0 && x < CHUNKSIZE){ // top edge
+                            tempChunk = serverMap.getChunk(data.cx, data.cy-1);
+                            index = (x + 1 + (y / CHUNKSIZE));
+                        }
+                        else if(y >= CHUNKSIZE && x >= 0 && x < CHUNKSIZE){ // bottom edge
+                            tempChunk = serverMap.getChunk(data.cx, data.cy+1);
+                            index = x + -1 + (y / CHUNKSIZE);
+                        }
+                        else if(x < 0 && y >= 0 && y < CHUNKSIZE){ // left edge
+                            tempChunk = serverMap.getChunk(data.cx-1, data.cy);
+                            index = (x + CHUNKSIZE) + (y / CHUNKSIZE);
+                        }
+                        else if(x >= CHUNKSIZE && y >= 0 && y < CHUNKSIZE){ // right edge
+                            tempChunk = serverMap.getChunk(data.cx+1, data.cy);
+                            index = (x - CHUNKSIZE) + (y / CHUNKSIZE);
+                        }
+                        else if(x < 0 && y < 0){ // top left corner
+                            tempChunk = serverMap.getChunk(data.cx-1, data.cy-1);
+                            index = (x + CHUNKSIZE) + 1 + (y / CHUNKSIZE);
+                        }
+                        else if(x >= CHUNKSIZE && y < 0){ // top right corner
+                            tempChunk = serverMap.getChunk(data.cx+1, data.cy-1);
+                            index = (x - CHUNKSIZE) + 1 + (y / CHUNKSIZE);
+                        }
+                        else if(x < 0 && y >= CHUNKSIZE){ // bottom left corner
+                            tempChunk = serverMap.getChunk(data.cx-1, data.cy+1);
+                            index = (x + CHUNKSIZE) + -1 + (y / CHUNKSIZE);
+                        }
+                        else if(x >= CHUNKSIZE && y >= CHUNKSIZE){ // bottom right corner
+                            tempChunk = serverMap.getChunk(data.cx+1, data.cy+1);
+                            index = (x - CHUNKSIZE) + -1 + (y / CHUNKSIZE);
+                        }
+                        if(tempChunk != undefined){
+                            if(index != undefined){
+                                if(data.amt > 0){
+                                    if (tempChunk.iron_data[index] > 0){
+                                        reward += tempChunk.iron_data[index];
+                                        tempChunk.iron_data[index] -= data.amt;
+                                    }
+                                    if (tempChunk.iron_data[index] < 0.3 && tempChunk.iron_data[index] !== -1){
+                                        tempChunk.iron_data[index] = 0;
+                                    }
+                                }
+                                else{
+                                    if (tempChunk.iron_data[index] < 1.3 && tempChunk.iron_data[index] !== -1){
+                                        tempChunk.iron_data[index] -= data.amt;
+                                    }
+                                    if (tempChunk.iron_data[index] > 1.3){
+                                        tempChunk.iron_data[index] = 1.3;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            if(reward > 0){
+                let itemBag = new Placeable("ItemBag", data.pos.x, data.pos.y, 0, 12*3, 13*3, 1, 11, "", "");
+                itemBag.type = "InvObj";
+                itemBag.invBlock = {items: {}};
+                itemBag.invBlock.invId = Math.random()*100000;
+                itemBag.invBlock.items["Raw Metal"] = {};
+                itemBag.invBlock.items["Raw Metal"].amount = Math.round(reward*0.2)+1;
+                chunk.objects.push(itemBag);
+                io.emit("NEW_OBJECT", {
+                    cx: chunk.cx, 
+                    cy: chunk.cy, 
+                    obj: itemBag
+                });
+            }
+            io.emit("UPDATE_IRON_NODES", data);
+        }
+
         socket.on("disconnect", disconnect);
 
         function disconnect(data){
