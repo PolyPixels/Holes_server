@@ -135,9 +135,7 @@ class Chunk{
             let m1 = new Placeable("Turret", (structX+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "Server", "", 100);
             let m2 = new Placeable("Turret", (structX+randX1+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY1+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "Server", "", 100);
             let m3 = new Placeable("Turret", (structX+randX2+(this.cx*CHUNKSIZE)) * TILESIZE, (structY+randY2+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 120, 120, 2, 0, "Server", "", 100);
-            m1.stage = 2;
-            m2.stage = 2;
-            m3.stage = 2;
+            
             this.objects.push(m1);
             this.objects.push(m2);
             this.objects.push(m3);
