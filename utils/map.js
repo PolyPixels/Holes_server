@@ -45,7 +45,7 @@ class Chunk{
     }
 
     generate(){
-        if(Math.abs(this.cx) > 5 || Math.abs(this.cy) > 5){
+        if(Math.abs(this.cx) > 25 || Math.abs(this.cy) > 25){
             for (let x = 0; x < CHUNKSIZE; x++) {
                 for (let y = 0; y < CHUNKSIZE; y++) {
                     const index = x + (y / CHUNKSIZE);
