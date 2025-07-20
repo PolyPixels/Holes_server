@@ -480,6 +480,15 @@ function newConnection(socket) {
                         socket.broadcast.emit("UPDATE_OBJ", data);
                     }
                 }
+                else if(data.brainID != undefined){
+                    //console.log(data);
+                    if(data.z == chunk.objects[i].z && data.brainID == chunk.objects[i].brainID){
+                        chunk.objects[i][data.update_name] = data.update_value;
+                        chunk.objects[i].pos.x = data.pos.x;
+                        chunk.objects[i].pos.y = data.pos.y;
+                        socket.broadcast.emit("UPDATE_OBJ", data);
+                    }
+                }
                 else{
                     if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
                         chunk.objects[i][data.update_name] = data.update_value;
@@ -548,6 +557,25 @@ function newConnection(socket) {
                     data.pos.y == chunk.soundObjs[i].pos.y
                 ){
                     chunk.soundObjs.splice(i, 1);
+                }
+            }
+        }
+
+        socket.on("wander_request", wander_request);
+
+        function wander_request(data){
+            for(let i=0; i<serverMap.brains.length; i++){
+                if(data.id == serverMap.brains[i].id){
+                    let angle = Math.random() * 2 * Math.PI;
+                    let target = {
+                        x: data.pos.x+Math.cos(angle) * 20,
+                        y: data.pos.y+Math.sin(angle) * 20
+                    }
+
+                    io.emit("WANDER_TARGET", {id: data.id, target: target});
+                    serverMap.brains[i].target = target;
+
+                    i=serverMap.brains.length;
                 }
             }
         }

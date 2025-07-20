@@ -11,6 +11,7 @@ class Map{
         noise2D = createNoise2D(alea(seed));
         this.seed = seed;
         this.chunks = {}; //referance with a string "x,y"     {ex. chunks["0,0"]}
+        this.brains = [];
         this.getChunk(0,0);
     }
 
@@ -19,6 +20,13 @@ class Map{
             //generate that chunk
             this.chunks[x+","+y] = new Chunk(x,y);
             this.chunks[x+","+y].generate();
+
+            if(Math.random() < 0.5){
+                let ant = new Placeable("Ant", Math.floor(Math.random()*CHUNKSIZE)+(x*CHUNKSIZE) * TILESIZE, Math.floor(Math.random()*CHUNKSIZE)+(y*CHUNKSIZE) * TILESIZE, 0, 17*2, 13*2, 2, 0, "Server", "", 100);
+                ant.brainID = Math.random()*10000;
+                this.brains.push({id: ant.brainID, target: null});
+                this.chunks[x+","+y].objects.push(ant);
+            }
         }
         return this.chunks[x+","+y];
     }
