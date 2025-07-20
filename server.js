@@ -486,7 +486,7 @@ function newConnection(socket) {
                         chunk.objects[i][data.update_name] = data.update_value;
                         chunk.objects[i].pos.x = data.pos.x;
                         chunk.objects[i].pos.y = data.pos.y;
-                        socket.broadcast.emit("UPDATE_OBJ", data);
+                        //socket.broadcast.emit("UPDATE_OBJ", data);
                     }
                 }
                 else{
@@ -568,8 +568,8 @@ function newConnection(socket) {
                 if(data.id == serverMap.brains[i].id){
                     let angle = Math.random() * 2 * Math.PI;
                     let target = {
-                        x: data.pos.x+Math.cos(angle) * 20,
-                        y: data.pos.y+Math.sin(angle) * 20
+                        x: data.pos.x+(Math.cos(angle) * 100),
+                        y: data.pos.y+(Math.sin(angle) * 100)
                     }
 
                     io.emit("WANDER_TARGET", {id: data.id, target: target});
