@@ -195,8 +195,8 @@ class Chunk{
             if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*3)+1};
             if(Math.random() < 0.2) temp.invBlock.items["Fire Staff"] = {amount: 1};
             if(Math.random() < 0.2) temp.invBlock.items["Laser Gun"] = {amount: 1};
-            if(Math.random() < 0.05) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*5)+1};
-            if(Math.random() < 0.05) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*5)+1};
+            if(Math.random() < 0.2) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*5)+1};
+            if(Math.random() < 0.4) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*5)+1};
             this.objects.push(temp);
             for(let x = sructX-5; x < sructX+5; x++){
                 for(let y = structY-5; y < structY+5; y++){
@@ -257,8 +257,8 @@ class Chunk{
                         if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*6)+1};
                         if(Math.random() < 0.2) temp.invBlock.items["Fire Staff"] = {amount: 1};
                         if(Math.random() < 0.2) temp.invBlock.items["Laser Gun"] = {amount: 1};
-                        if(Math.random() < 0.05) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*9)+1};
-                        if(Math.random() < 0.05) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*10)+1};
+                        if(Math.random() < 0.2) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*9)+1};
+                        if(Math.random() < 0.4) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*10)+1};
                         this.objects.push(temp);
                         temp = new Placeable("Chest", (((x+2.1)*3.98)+(this.cx*CHUNKSIZE)) * TILESIZE, (((y+2.4)*3.98)+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 128, 128, 0, 0, "", "", 100);
                         //add items to the chest
@@ -268,8 +268,8 @@ class Chunk{
                         if(Math.random() < 0.5) temp.invBlock.items["Tech"] = {amount: Math.floor(Math.random()*6)+1};
                         if(Math.random() < 0.2) temp.invBlock.items["Fire Staff"] = {amount: 1};
                         if(Math.random() < 0.2) temp.invBlock.items["Laser Gun"] = {amount: 1};
-                        if(Math.random() < 0.05) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*9)+1};
-                        if(Math.random() < 0.05) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*10)+1};
+                        if(Math.random() < 0.2) temp.invBlock.items["Philosopher's Stone"] = {amount: Math.floor(Math.random()*9)+1};
+                        if(Math.random() < 0.4) temp.invBlock.items["Black Gem"] = {amount: Math.floor(Math.random()*10)+1};
                     }
                     else{
                         if(Math.random() < 0.9) temp = new Placeable("Floor", (((x+2.1)*3.98)+(this.cx*CHUNKSIZE)) * TILESIZE, (((y+2.1)*3.98)+(this.cy*CHUNKSIZE)) * TILESIZE, 0, 128, 128, 0, 0, "Server", "", 100);
