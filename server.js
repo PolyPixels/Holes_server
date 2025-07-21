@@ -786,10 +786,6 @@ setInterval(() => {
             console.error(`Server restart stderr: ${stderr}`);
         });
         }
-
-        //restart the server 
-    
-        
         
     }else {
 
