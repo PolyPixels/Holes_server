@@ -21,8 +21,12 @@ class Map{
             this.chunks[x+","+y] = new Chunk(x,y);
             this.chunks[x+","+y].generate();
 
-            if(Math.random() < 0.5){
-                let ant = new Placeable("Ant", Math.floor(Math.random()*CHUNKSIZE)+(x*CHUNKSIZE) * TILESIZE, Math.floor(Math.random()*CHUNKSIZE)+(y*CHUNKSIZE) * TILESIZE, 0, 17*2, 13*2, 2, 0, "Server", "", 100);
+            if(Math.random() < 0.5 && !(x == 0 && y == 0)){
+                let ant = new Placeable("Ant", 
+                    ((Math.random()*CHUNKSIZE)+(x*CHUNKSIZE)) * TILESIZE, 
+                    ((Math.random()*CHUNKSIZE)+(y*CHUNKSIZE)) * TILESIZE, 
+                    0, 17*2, 13*2, 2, 0, "Server", "", 100
+                );
                 ant.brainID = Math.random()*10000;
                 this.brains.push({id: ant.brainID, target: null});
                 this.chunks[x+","+y].objects.push(ant);
@@ -128,7 +132,7 @@ class Chunk{
                 }
             }
         }
-        if(rand < 0.3){ //add turrets
+        if(rand < 0.3 && !(this.cx == 0 && this.cy == 0)){ //add turrets
             let structX = Math.floor(Math.random()*CHUNKSIZE);
             let structY = Math.floor(Math.random()*CHUNKSIZE);
             if(structX > CHUNKSIZE-6) structX = CHUNKSIZE-6;
@@ -207,7 +211,7 @@ class Chunk{
                 }
             }
         }
-        else if (rand < 0.8) {
+        else if (rand < 0.8  && !(this.cx == 0 && this.cy == 0)) {
             let old_dirt = [];
             for(let x = 7; x < CHUNKSIZE-7; x++){
                 for(let y = 7; y < CHUNKSIZE-7; y++){
