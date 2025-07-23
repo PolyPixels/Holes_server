@@ -121,8 +121,33 @@ function newConnection(socket) {
             }
 
             socket.broadcast.emit('NEW_PLAYER', data.player);
+            socket.broadcast.emit("PLAYERS_CHECK", {
+                ids: Object.keys(players)
+            });
         }
         
+
+        socket.on("disconnect", disconnect);
+
+        function disconnect(data){
+            console.log(socket.id + " disconnected");
+            if(players[socket.id] != undefined){
+                console.log(
+                    "{\n" +
+                    "   id: "+players[socket.id].id + 
+                    "\n   name: " + players[socket.id].name + 
+                    "\n   kills: " + players[socket.id].kills + 
+                    "\n   deaths: " + players[socket.id].deaths +
+                    "\n}"
+                );
+                kills_deaths[socket.id] = {kills: players[socket.id].kills, deaths: players[socket.id].deaths};
+            }
+            
+            players[socket.id] = [];
+            delete players[socket.id];
+            
+            io.emit("REMOVE_PLAYER", socket.id);
+        }
 
         socket.on("update_pos", update_pos);
 
@@ -418,20 +443,6 @@ function newConnection(socket) {
                 });
             }
             io.emit("UPDATE_IRON_NODES", data);
-        }
-
-        socket.on("disconnect", disconnect);
-
-        function disconnect(data){
-            console.log(socket.id + " disconnected");
-            if(players[socket.id] != undefined){
-                kills_deaths[socket.id] = {kills: players[socket.id].kills, deaths: players[socket.id].deaths};
-            }
-            
-            players[socket.id] = [];
-            delete players[socket.id];
-            
-            socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
 
         socket.on("new_object", new_object);
