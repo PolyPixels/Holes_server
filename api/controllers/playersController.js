@@ -10,7 +10,7 @@ exports.getPlayerInfo = (req, res) => {
         return res.status(500).json({ error: "Player data not available." });
     }
 
-    console.log(players)
+    //console.log(players)
 
     const playerList = Object.values(players).map(p => ({
         name: p.name || "Unknown",

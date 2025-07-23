@@ -7,6 +7,7 @@ const { getGlobals } = require("./globals"); // Ensure correct import
 const { exec } = require('child_process');
 const globals = getGlobals(); // Now it correctly retrieves global variables
 let { players,serverMap,chatMessages} = globals;
+var kills_deaths = {};
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -106,6 +107,21 @@ function newConnection(socket) {
             });
         }
         
+        socket.on('player_reconnected', player_reconnected);
+        function player_reconnected(data) {
+            players[data.player.id] = data.player;
+            if(kills_deaths[data.oldID] != undefined){
+                players[data.player.id].kills = kills_deaths[data.oldID].kills;
+                players[data.player.id].deaths = kills_deaths[data.oldID].deaths;
+                delete kills_deaths[data.oldID];
+            }
+            else{
+                players[data.player.id].kills = 0;
+                players[data.player.id].deaths = 0;
+            }
+
+            socket.broadcast.emit('NEW_PLAYER', data.player);
+        }
         
 
         socket.on("update_pos", update_pos);
@@ -136,7 +152,7 @@ function newConnection(socket) {
                     players[data.id].statBlock.stats[data.update_names[i].split("stats.")[1]] = data.update_values[i];
                 }
                 else if(data.update_names[i].includes("statBlock")){
-                    console.log("statBlock update", data.update_names[i], data.update_values[i]);
+                    //console.log("statBlock update", data.update_names[i], data.update_values[i]);
                     players[data.id].statBlock[data.update_names[i].split("statBlock.")[1]] = data.update_values[i];
                 }
                 else{
@@ -408,8 +424,13 @@ function newConnection(socket) {
 
         function disconnect(data){
             console.log(socket.id + " disconnected");
+            if(players[socket.id] != undefined){
+                kills_deaths[socket.id] = {kills: players[socket.id].kills, deaths: players[socket.id].deaths};
+            }
+            
             players[socket.id] = [];
             delete players[socket.id];
+            
             socket.broadcast.emit("REMOVE_PLAYER", socket.id);
         }
 
@@ -657,7 +678,7 @@ function newConnection(socket) {
                         // If the player is within their hearing range, send the chat message.
                         if (distance <= 5000+(player.statBlock.stats.hearing*20 * players[socket.id].statBlock.stats.speakingRange)) {
                             //console.log("???????",chatMsg)
-                            console.log(chatMsg)
+                            //console.log(chatMsg)
                             //check chat message to bad words 
                             if (badWordRegex.test(chatMsg.message)) {
                                 chatMsg.message = "I curse at you !!!"
@@ -672,9 +693,9 @@ function newConnection(socket) {
 
         //death sockets Player_Dies
         socket.on("player_dies", (data) => {
-            console.log(data);
+            //console.log(data);
             const { x, y, id, attacker, name } = data;
-            console.log("die mentions",x,y,id,attacker,name);
+            //console.log("die mentions",x,y,id,attacker,name);
             // Mark the player as dead in the server-side state (optional, depends on your logic)
             if (players[id]) {
                 players[id].isDead = true; // or players[id].status = "dead", etc.
@@ -686,26 +707,26 @@ function newConnection(socket) {
                     let player = players[pid];
                     if(player.name == attacker){
                         player.kills +=1;
-                        console.log(player.name, player.kills)
+                        //console.log(player.name, player.kills)
                     }
                     if (player && player.pos && typeof player.statBlock.stats.hearing === 'number') {
                         let dx = player.pos.x - x;
                         let dy = player.pos.y - y;
                         let distance = Math.sqrt(dx * dx + dy * dy);
-                        console.log(distance)
+                        //console.log(distance)
                         if (distance <= 1115000 + (player.statBlock.stats.hearing * 20)) {
-                            console.log(name + " Has been killed by " + attacker , x,y )
+                            //console.log(name + " Has been killed by " + attacker , x,y )
             
-                            console.log(player.name, player.kills)
+                            //console.log(player.name, player.kills)
                                 
                             io.to(pid).emit("NEW_CHAT_MESSAGE", {message: name + " Has been killed by " + attacker , x,y , user:"SERVER"});
                                                       
                         }else{
-                            console.log("s2")
+                            //console.log("s2")
                         }
                     }
                 }else{
-                    console.log("????")
+                    //console.log("????")
                 }
             }
         
