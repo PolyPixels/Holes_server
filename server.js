@@ -457,30 +457,28 @@ function newConnection(socket) {
         socket.on("delete_obj", delete_obj);
 
         function delete_obj(data){
+            //console.log(data);
             let chunk = serverMap.getChunk(data.cx, data.cy);
             for(let i = chunk.objects.length-1; i >= 0; i--){
                 if(data.objName == "ExpOrb"){
                     if(data.z == chunk.objects[i].z && data.id == chunk.objects[i].id){
-                        socket.broadcast.emit("DELETE_OBJ", data);
+                        io.emit("DELETE_OBJ", data);
                         chunk.objects.splice(i, 1);
                         spawnItemBag(chunk, data);
-                        i = chunk.objects.length;
                     }
                 }
                 else if(data.brainID != undefined){
                     if(data.z == chunk.objects[i].z && data.brainID == chunk.objects[i].brainID){
-                        socket.broadcast.emit("DELETE_OBJ", data);
+                        io.emit("DELETE_OBJ", data);
                         chunk.objects.splice(i, 1);
                         spawnItemBag(chunk, data);
-                        i = chunk.objects.length;
                     }
                 }
                 else{
                     if(data.pos.x == chunk.objects[i].pos.x && data.pos.y == chunk.objects[i].pos.y && data.z == chunk.objects[i].z && data.objName == chunk.objects[i].objName){
-                        socket.broadcast.emit("DELETE_OBJ", data);
+                        io.emit("DELETE_OBJ", data);
                         chunk.objects.splice(i, 1);
                         spawnItemBag(chunk, data);
-                        i = chunk.objects.length;
                     }
                 }
             }
