@@ -4,6 +4,6 @@ const statusController = require('../controllers/statusController');
 const playersController = require('../controllers/playersController');
 
 router.get('/status', statusController.getStatus);
-router.get("/playerinfo", playersController.getPlayerInfo)
+router.get('/playerinfo', playersController.getPlayerInfo);
 
 module.exports = router;

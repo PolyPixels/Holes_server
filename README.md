@@ -1,6 +1,5 @@
 ![image](https://github.com/user-attachments/assets/735a3bfb-79dd-49ad-8934-5f13f893dd11)
 
-
 Here’s an updated `README.md` file that includes the use of `express.static` to serve static files, along with other relevant details about the project:
 
 ---
@@ -77,13 +76,13 @@ Access the client files in your browser by navigating to `http://localhost:3000`
 
 ## Socket Events
 
-| Event Name      | Payload                  | Description                                 |
-|-----------------|--------------------------|---------------------------------------------|
-| `connection`    | `socket`                 | Triggered when a new client connects        |
-| `new_player`    | `{id, position, ...}`    | Adds a new player to the game               |
-| `update_pos`    | `{id, position}`         | Updates the position of a player            |
-| `update_node`   | `{index, value}`         | Updates the map node                        |
-| `disconnect`    |                          | Triggered when a client disconnects         |
+| Event Name    | Payload               | Description                          |
+| ------------- | --------------------- | ------------------------------------ |
+| `connection`  | `socket`              | Triggered when a new client connects |
+| `new_player`  | `{id, position, ...}` | Adds a new player to the game        |
+| `update_pos`  | `{id, position}`      | Updates the position of a player     |
+| `update_node` | `{index, value}`      | Updates the map node                 |
+| `disconnect`  |                       | Triggered when a client disconnects  |
 
 ---
 
@@ -114,6 +113,7 @@ The server includes a noise-based map generation system. Each map is dynamically
 ---
 
 # ENVs
+
 ```
 SERVER_LOGO
 SERVER_NAME
@@ -122,11 +122,10 @@ SERVER_NAME
 ## Troubleshooting
 
 ### CORS Errors
+
 If you encounter **CORS errors**, ensure that the frontend and backend are configured properly. The server has been configured to allow requests from [`http://127.0.0.1:5500`](http://127.0.0.1:5500/game/index.html).
 
-
-
-# basic Docker file 
+# basic Docker file
 
 ```
 docker pull polypikzel/holesgame
@@ -134,7 +133,5 @@ docker pull polypikzel/holesgame
 
 pull run and dig !
 https://hub.docker.com/r/polypikzel/holesgame
+
 ---
-
-
-
