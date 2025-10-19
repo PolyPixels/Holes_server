@@ -516,6 +516,8 @@ function newConnection(socket) {
                     });
                 }
             }
+
+            mergeAllChunkBags()
         }
 
         socket.on("update_obj", update_obj);
@@ -839,8 +841,90 @@ setInterval(() => {
         }
         
     }else {
-
     countdown--;
     }
 }, 1000); // Runs every second
 
+function mergeAllChunkBags() {
+    const MERGE_DISTANCE = 500;
+
+    for (const key in serverMap.chunks) {
+        const chunk = serverMap.chunks[key];
+        if (!chunk || !Array.isArray(chunk.objects)) continue;
+
+        // Try to get numeric cx/cy for emits even if chunk lacks them
+        let cx = typeof chunk.cx === "number" ? chunk.cx : undefined;
+        let cy = typeof chunk.cy === "number" ? chunk.cy : undefined;
+        if (cx === undefined || cy === undefined) {
+            const [kx, ky] = key.split(",").map(n => parseInt(n, 10));
+            if (!Number.isNaN(kx) && !Number.isNaN(ky)) {
+                cx = kx; cy = ky;
+            }
+        }
+
+        let merged = true;
+        while (merged) {
+            merged = false;
+
+            for (let i = 0; i < chunk.objects.length; i++) {
+                const bagA = chunk.objects[i];
+                if (!bagA || bagA.type !== "InvObj" || !bagA.pos) continue;
+                if (!bagA.invBlock) bagA.invBlock = { items: {}, invId: Math.random() * 100000 };
+                if (!bagA.invBlock.items) bagA.invBlock.items = {};
+
+                for (let j = i + 1; j < chunk.objects.length; j++) {
+                    const bagB = chunk.objects[j];
+                    if (!bagB || bagB.type !== "InvObj" || !bagB.pos) continue;
+                    if (!bagB.invBlock || !bagB.invBlock.items) continue;
+
+                    const dx = bagA.pos.x - bagB.pos.x;
+                    const dy = bagA.pos.y - bagB.pos.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist <= MERGE_DISTANCE) {
+                        // 1) Merge items into A
+                        for (const item in bagB.invBlock.items) {
+                            if (!bagA.invBlock.items[item]) {
+                                bagA.invBlock.items[item] = { amount: 0 };
+                            }
+                            bagA.invBlock.items[item].amount += bagB.invBlock.items[item].amount;
+                        }
+
+                        // 2) Remove B from server state
+                        const removed = chunk.objects.splice(j, 1)[0];
+
+                        // 3) Notify all clients:
+                        //    3a) A's inventory changed
+                        io.emit("UPDATE_INV", {
+                            cx,
+                            cy,
+                            objName: bagA.objName || "ItemBag",
+                            pos: { x: bagA.pos.x, y: bagA.pos.y },
+                            z: bagA.z ?? 0,
+                            items: bagA.invBlock.items
+                        });
+
+                        //    3b) B should be deleted client-side
+                        io.emit("DELETE_OBJ", {
+                            cx,
+                            cy,
+                            objName: (removed && removed.objName) || "ItemBag",
+                            pos: removed?.pos ? { x: removed.pos.x, y: removed.pos.y } : { x: bagB.pos.x, y: bagB.pos.y },
+                            z: removed?.z ?? bagB.z ?? 0
+                        });
+
+                        console.log(
+                            `[mergeAllChunkBags] Merged bag at (${bagB.pos.x},${bagB.pos.y}) into (${bagA.pos.x},${bagA.pos.y}) in chunk ${key}`
+                        );
+
+                        // Since we modified the array, restart inner loop
+                        merged = true;
+                        break;
+                    }
+                }
+
+                if (merged) break; // restart outer loop
+            }
+        }
+    }
+}
