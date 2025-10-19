@@ -846,7 +846,7 @@ setInterval(() => {
 }, 1000); // Runs every second
 
 function mergeAllChunkBags() {
-    const MERGE_DISTANCE = 500;
+    const MERGE_DISTANCE = 200;
 
     for (const key in serverMap.chunks) {
         const chunk = serverMap.chunks[key];
